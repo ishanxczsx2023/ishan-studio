@@ -1,0 +1,18 @@
+{
+  "name": "Ishan Studio",
+  "short_name": "Ishan Studio",
+  "description": "All-in-One 4K Media & Transcript Downloader",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/static/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

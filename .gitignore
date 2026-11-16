@@ -1,0 +1,11 @@
+downloads/*
+!downloads/.gitkeep
+__pycache__/
+*.pyc
+*.log
+.env
+.gradle/
+build/
+android/app/build/
+android/.gradle/
+*.apk

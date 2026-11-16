@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Ishan Studio - All-in-One 4K Media & Transcript Downloader</title>
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#8b5cf6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/png" href="/static/icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              gold: '#fbbf24',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes gold-shimmer {
+      0%, 100% { border-color: rgba(251, 191, 36, 0.4); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+      50% { border-color: rgba(251, 191, 36, 0.9); box-shadow: 0 0 25px rgba(251, 191, 36, 0.4); }
+    }
+    .gold-glow {
+      animation: gold-shimmer 3s infinite;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-purple-500 selection:text-white pb-12">
+
+  <!-- Background decorative light aura -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -right-32 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 left-1/4 w-96 h-96 bg-emerald-600/15 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/20 flex items-center justify-center">
+          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <span class="text-lg font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">IS</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base font-extrabold tracking-tight text-white">Ishan Studio</h1>
+            <span class="px-1.5 py-0.2 text-[10px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">PRO 4K</span>
+          </div>
+          <p class="text-[11px] text-slate-400">All-in-One Media & Transcript</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button 
+          id="installPwaBtn" 
+          onclick="triggerPwaInstall()" 
+          class="hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-900/40 border border-purple-400/30 flex items-center gap-1.5 transition-all"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          ইনস্টল করুন
+        </button>
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Live
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Ad Slot Container (Monetization Placeholder) -->
+  <div class="max-w-2xl w-full mx-auto px-4 pt-3">
+    <div class="w-full bg-slate-900/40 border border-dashed border-slate-800 rounded-xl p-2.5 text-center flex flex-col items-center justify-center">
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড বিজ্ঞাপন / Advertisement Slot</span>
+      <div class="h-10 flex items-center justify-center text-xs text-slate-400 font-medium">
+        ✨ Ishan Studio Pro • 4K Downloader & Transcript Engine
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-4 space-y-5">
+
+    <!-- Supported Platforms Pill Row -->
+    <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 text-xs">
+      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-red-500/30 flex items-center justify-center gap-1.5 text-slate-200">
+        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+        <span class="font-bold">YouTube (4K)</span>
+      </div>
+      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-pink-500/30 flex items-center justify-center gap-1.5 text-slate-200">
+        <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+        <span class="font-bold">Instagram</span>
+      </div>
+      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex items-center justify-center gap-1.5 text-slate-200">
+        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span class="font-bold">TikTok</span>
+      </div>
+      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-rose-600/30 flex items-center justify-center gap-1.5 text-slate-200">
+        <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+        <span class="font-bold">Pinterest</span>
+      </div>
+    </div>
+
+    <!-- URL Input Card -->
+    <div class="glass-card rounded-2xl p-4 shadow-2xl relative overflow-hidden">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+            </svg>
+            ভিডিও লিঙ্ক পেস্ট করুন
+          </label>
+          <span id="detectedBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Detected</span>
+        </div>
+
+        <div class="relative flex items-center">
+          <input 
+            type="text" 
+            id="urlInput" 
+            placeholder="ইউটিউব, ইন্সটাগ্রাম, টিকটক বা পিন্টারেস্ট লিঙ্ক দিন..." 
+            class="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl pl-3.5 pr-24 py-3 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 text-white placeholder-slate-500 transition-all font-mono"
+            oninput="handleInputDetect(this.value)"
+          >
+          <div class="absolute right-2 flex items-center">
+            <button 
+              type="button" 
+              onclick="handlePaste()" 
+              class="px-3 py-1.5 text-xs font-bold bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 rounded-lg transition-all border border-purple-500/40 flex items-center gap-1 active:scale-95"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              Paste
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="button" 
+          id="analyzeBtn" 
+          onclick="analyzeMedia()" 
+          class="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:brightness-110 active:scale-[0.99] text-white shadow-xl shadow-purple-950/50 flex items-center justify-center gap-2 transition-all"
+        >
+          <svg id="analyzeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span id="analyzeBtnText">অ্যানালাইজ ও রেজোলিউশন দেখুন</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="errorBox" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
+      <svg class="w-5 h-5 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div id="errorText" class="flex-1 break-words"></div>
+    </div>
+
+    <!-- Media Card Preview (Appears when analyzed) -->
+    <div id="mediaCard" class="hidden glass-card rounded-2xl overflow-hidden shadow-2xl space-y-4">
+      <!-- Media Header -->
+      <div class="sm:flex border-b border-slate-800/80">
+        <div class="relative sm:w-60 aspect-video bg-black shrink-0 overflow-hidden">
+          <img id="thumbImg" src="" alt="Thumbnail" class="w-full h-full object-cover">
+          <span id="durationBadge" class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-md text-white font-mono text-xs px-2 py-0.5 rounded font-bold">00:00</span>
+          <span id="platformBadge" class="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-purple-600/90 text-white backdrop-blur-md">YouTube</span>
+        </div>
+        <div class="p-4 flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <h2 id="videoTitle" class="font-bold text-sm sm:text-base line-clamp-2 text-white">Title</h2>
+            <p id="creatorName" class="text-xs text-purple-400 font-semibold flex items-center gap-1">
+              <span>Channel</span>
+            </p>
+          </div>
+          <div class="flex items-center justify-between text-xs text-slate-400 mt-2">
+            <span id="viewsCount">Views: --</span>
+            <button 
+              type="button" 
+              id="transcriptTriggerBtn"
+              onclick="fetchTranscriptModal()" 
+              class="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-bold border border-indigo-500/30 flex items-center gap-1 transition-all"
+            >
+              📝 ট্রান্সক্রিপ্ট (Text)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Format Selection -->
+      <div class="p-4 sm:p-5 space-y-4 pt-0">
+        <!-- Tabs: Video vs Audio -->
+        <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800">
+          <button 
+            type="button" 
+            id="tabVideo" 
+            onclick="setTab('video')" 
+            class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-purple-600 text-white shadow transition-all flex items-center justify-center gap-1.5"
+          >
+            🎥 ভিডিও (Video MP4)
+          </button>
+          <button 
+            type="button" 
+            id="tabAudio" 
+            onclick="setTab('audio')" 
+            class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5"
+          >
+            🎵 অডিও (MP3 320k)
+          </button>
+        </div>
+
+        <!-- Video Format Grid -->
+        <div id="videoOptionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Audio Format Grid -->
+        <div id="audioOptionsGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Storage Preference -->
+        <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-300">
+          <label for="saveSdcardCheck" class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="saveSdcardCheck" checked class="w-4 h-4 rounded text-purple-600 bg-slate-950 border-slate-700 focus:ring-purple-500">
+            <span>সরাসরি মোবাইলের স্টোরেজে সেভ করুন (<code class="text-purple-400 font-mono">/sdcard/Download</code>)</span>
+          </label>
+        </div>
+
+        <!-- Download Action Button -->
+        <button 
+          type="button" 
+          id="startDownloadBtn" 
+          onclick="startDownloadTask()" 
+          class="w-full py-4 px-4 rounded-xl font-extrabold text-sm sm:text-base bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:brightness-110 active:scale-[0.99] text-white shadow-xl shadow-emerald-950/50 flex items-center justify-center gap-2 transition-all"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span id="downloadBtnText">ডাউনলোড শুরু করুন (Download Now)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Download Progress Card -->
+    <div id="progressCard" class="hidden glass-card rounded-2xl p-5 shadow-2xl space-y-4 border-purple-500/30">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-3 h-3 rounded-full bg-purple-500 animate-ping"></div>
+          <span id="progressStateText" class="font-bold text-sm text-white">ডাউনলোড প্রসেস হচ্ছে...</span>
+        </div>
+        <span id="progressPercentText" class="font-mono text-sm font-bold text-purple-400">0%</span>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
+        <div id="progressBarFill" class="bg-gradient-to-r from-purple-500 via-cyan-400 to-emerald-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-3 gap-2 text-center text-xs text-slate-400 pt-1">
+        <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+          <p class="text-slate-500 text-[10px]">Speed</p>
+          <p id="progressSpeedText" class="font-mono font-bold text-slate-200 mt-0.5">0 KB/s</p>
+        </div>
+        <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+          <p class="text-slate-500 text-[10px]">Downloaded</p>
+          <p id="progressSizeText" class="font-mono font-bold text-slate-200 mt-0.5">0 / 0</p>
+        </div>
+        <div class="bg-slate-950/80 p-2 rounded-xl border border-slate-800">
+          <p class="text-slate-500 text-[10px]">Time Left</p>
+          <p id="progressEtaText" class="font-mono font-bold text-slate-200 mt-0.5">--</p>
+        </div>
+      </div>
+
+      <!-- Completed Block -->
+      <div id="completedBlock" class="hidden pt-2 space-y-2">
+        <a 
+          id="directFileHref" 
+          href="#" 
+          class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 transition-all"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          ফাইলটি ফোনে সেভ / ওপেন করুন
+        </a>
+        <p id="sdcardSuccessText" class="text-xs text-center text-emerald-400 font-semibold"></p>
+      </div>
+    </div>
+
+    <!-- Native Ad Placement Slot (Bottom) -->
+    <div class="w-full bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 text-center space-y-2">
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড পার্টনার / Sponsored Slot</span>
+      <div class="py-3 px-4 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center gap-3 text-left">
+          <div class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold">
+            ⚡
+          </div>
+          <div>
+            <h4 class="text-xs font-bold text-white">Ishan Studio Official App</h4>
+            <p class="text-[11px] text-slate-400">Download YouTube 4K, Reels & TikTok effortlessly</p>
+          </div>
+        </div>
+        <button class="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white hover:bg-purple-500">Open</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Transcript Modal -->
+  <div id="transcriptModal" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4 transition-all">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl max-h-[85vh] rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="flex items-center gap-2">
+          <span class="text-base">📝</span>
+          <h3 class="font-bold text-sm text-white">ভিডিও ট্রান্সক্রিপ্ট (Full Transcript)</h3>
+        </div>
+        <button onclick="closeTranscriptModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-4 overflow-y-auto flex-1 font-mono text-xs leading-relaxed text-slate-300 space-y-2" id="transcriptBody">
+        <p class="text-slate-500">লোড হচ্ছে...</p>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 flex items-center justify-between bg-slate-950/80">
+        <span id="transcriptStats" class="text-xs text-slate-400">0 lines</span>
+        <button 
+          id="copyTranscriptBtn" 
+          onclick="copyTranscriptText()" 
+          class="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 shadow"
+        >
+          📋 কপি করুন (Copy All)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center text-xs text-slate-500 py-6">
+    <p class="font-semibold text-slate-400">Ishan Studio &bull; Developed for Android & Global Web</p>
+    <p class="text-[11px] mt-1 text-slate-600">Built with Python, FFmpeg, yt-dlp & Tailored for high-speed 4K</p>
+  </footer>
+
+  <script>
+    let currentData = null;
+    let chosenFormat = null;
+    let activeTab = 'video';
+    let pollInterval = null;
+    let currentTranscriptText = '';
+    let deferredInstallPrompt = null;
+
+    // PWA Install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById('installPwaBtn');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    function triggerPwaInstall() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then((choice) => {
+          if (choice.outcome === 'accepted') {
+            document.getElementById('installPwaBtn').classList.add('hidden');
+          }
+          deferredInstallPrompt = null;
+        });
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/sw.js').catch(console.warn);
+    }
+
+    function vibrateDevice(ms = 30) {
+      if (navigator.vibrate) {
+        navigator.vibrate(ms);
+      }
+    }
+
+    async function handlePaste() {
+      vibrateDevice(40);
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('urlInput').value = text.trim();
+          handleInputDetect(text.trim());
+          analyzeMedia();
+        }
+      } catch (err) {
+        alert("ক্লিপবোর্ড থেকে পেস্ট করতে অনুমতি দিন অথবা বক্সে লং-প্রেস করে পেস্ট করুন।");
+      }
+    }
+
+    function handleInputDetect(url) {
+      const badge = document.getElementById('detectedBadge');
+      const u = url.toLowerCase();
+      if (u.includes('youtube') || u.includes('youtu.be')) {
+        badge.innerText = 'YouTube 4K';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30';
+        badge.classList.remove('hidden');
+      } else if (u.includes('instagram.com')) {
+        badge.innerText = 'Instagram Reel';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30';
+        badge.classList.remove('hidden');
+      } else if (u.includes('tiktok.com')) {
+        badge.innerText = 'TikTok No-WM';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
+        badge.classList.remove('hidden');
+      } else if (u.includes('pinterest.com') || u.includes('pin.it')) {
+        badge.innerText = 'Pinterest Video';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30';
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    async function analyzeMedia() {
+      const url = document.getElementById('urlInput').value.trim();
+      const errorBox = document.getElementById('errorBox');
+      const errorText = document.getElementById('errorText');
+      const mediaCard = document.getElementById('mediaCard');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const analyzeBtnText = document.getElementById('analyzeBtnText');
+
+      errorBox.classList.add('hidden');
+      mediaCard.classList.add('hidden');
+
+      if (!url) return;
+
+      vibrateDevice(30);
+      analyzeBtn.disabled = true;
+      analyzeBtnText.innerText = "অ্যানালাইজ করা হচ্ছে...";
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'ভিডিও তথ্য সংগ্রহ করা সম্ভব হয়নি।');
+        }
+
+        currentData = data;
+        renderMediaDetails(data);
+      } catch (err) {
+        errorText.innerText = err.message;
+        errorBox.classList.remove('hidden');
+      } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtnText.innerText = "অ্যানালাইজ ও রেজোলিউশন দেখুন";
+      }
+    }
+
+    function renderMediaDetails(data) {
+      document.getElementById('thumbImg').src = data.thumbnail;
+      document.getElementById('durationBadge').innerText = data.duration;
+      document.getElementById('platformBadge').innerText = data.platform;
+      document.getElementById('videoTitle').innerText = data.title;
+      document.getElementById('creatorName').querySelector('span').innerText = data.uploader;
+      document.getElementById('viewsCount').innerText = `Views: ${data.views}`;
+
+      // Video Options
+      const videoGrid = document.getElementById('videoOptionsGrid');
+      videoGrid.innerHTML = '';
+      data.video_options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = `video_opt_${idx}`;
+        const isGold = opt.is_gold;
+        btn.className = `p-3 rounded-xl border text-left transition-all flex items-center justify-between ${idx === 0 ? (isGold ? 'bg-amber-950/40 border-amber-500 text-white gold-glow' : 'bg-purple-950/40 border-purple-500 text-white') : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'}`;
+        btn.innerHTML = `
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="font-bold text-xs sm:text-sm text-white">${opt.label}</p>
+            </div>
+            <p class="text-[11px] text-slate-400">Lossless MP4 • Audio + Video</p>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded font-extrabold ${isGold ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-purple-300 font-mono'}">${opt.badge}</span>
+        `;
+        btn.onclick = () => selectOption(opt, `video_opt_${idx}`);
+        videoGrid.appendChild(btn);
+      });
+
+      // Audio Options
+      const audioGrid = document.getElementById('audioOptionsGrid');
+      audioGrid.innerHTML = '';
+      data.audio_options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = `audio_opt_${idx}`;
+        btn.className = `p-3 rounded-xl border text-left transition-all flex items-center justify-between ${idx === 0 ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'}`;
+        btn.innerHTML = `
+          <div>
+            <p class="font-bold text-xs sm:text-sm text-white">${opt.label}</p>
+            <p class="text-[11px] text-slate-400">High Bitrate Audio Track</p>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-purple-300 font-mono uppercase font-bold">${opt.badge}</span>
+        `;
+        btn.onclick = () => selectOption(opt, `audio_opt_${idx}`);
+        audioGrid.appendChild(btn);
+      });
+
+      // Select default (first video option)
+      if (data.video_options.length > 0) {
+        selectOption(data.video_options[0], 'video_opt_0');
+      }
+
+      mediaCard.classList.remove('hidden');
+      mediaCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function selectOption(opt, elementId) {
+      vibrateDevice(20);
+      chosenFormat = opt;
+      document.querySelectorAll('#videoOptionsGrid button, #audioOptionsGrid button').forEach(el => {
+        el.className = el.className.replace('bg-purple-950/40 border-purple-500 text-white', 'bg-slate-950/80 border-slate-800 text-slate-300');
+        el.className = el.className.replace('bg-amber-950/40 border-amber-500 text-white gold-glow', 'bg-slate-950/80 border-slate-800 text-slate-300');
+      });
+      const el = document.getElementById(elementId);
+      if (el) {
+        if (opt.is_gold) {
+          el.className = el.className.replace('bg-slate-950/80 border-slate-800 text-slate-300', 'bg-amber-950/40 border-amber-500 text-white gold-glow');
+        } else {
+          el.className = el.className.replace('bg-slate-950/80 border-slate-800 text-slate-300', 'bg-purple-950/40 border-purple-500 text-white');
+        }
+      }
+    }
+
+    function setTab(tab) {
+      vibrateDevice(20);
+      activeTab = tab;
+      const tabVideo = document.getElementById('tabVideo');
+      const tabAudio = document.getElementById('tabAudio');
+      const videoGrid = document.getElementById('videoOptionsGrid');
+      const audioGrid = document.getElementById('audioOptionsGrid');
+
+      if (tab === 'video') {
+        tabVideo.className = "flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-purple-600 text-white shadow transition-all flex items-center justify-center gap-1.5";
+        tabAudio.className = "flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5";
+        videoGrid.classList.remove('hidden');
+        audioGrid.classList.add('hidden');
+        if (currentData && currentData.video_options.length > 0) {
+          selectOption(currentData.video_options[0], 'video_opt_0');
+        }
+      } else {
+        tabAudio.className = "flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-purple-600 text-white shadow transition-all flex items-center justify-center gap-1.5";
+        tabVideo.className = "flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5";
+        audioGrid.classList.remove('hidden');
+        videoGrid.classList.add('hidden');
+        if (currentData && currentData.audio_options.length > 0) {
+          selectOption(currentData.audio_options[0], 'audio_opt_0');
+        }
+      }
+    }
+
+    async function startDownloadTask() {
+      if (!currentData || !chosenFormat) return;
+
+      vibrateDevice(40);
+      const saveSdcard = document.getElementById('saveSdcardCheck').checked;
+      const progressCard = document.getElementById('progressCard');
+      const startBtn = document.getElementById('startDownloadBtn');
+      const completedBlock = document.getElementById('completedBlock');
+
+      startBtn.disabled = true;
+      completedBlock.classList.add('hidden');
+      progressCard.classList.remove('hidden');
+      progressCard.scrollIntoView({ behavior: 'smooth' });
+
+      document.getElementById('progressStateText').innerText = "ডাউনলোড প্রস্তুতি চলছে...";
+      document.getElementById('progressBarFill').style.width = "5%";
+      document.getElementById('progressPercentText').innerText = "5%";
+
+      try {
+        const payload = {
+          url: currentData.url,
+          format_spec: chosenFormat.format_spec,
+          is_audio: chosenFormat.type === 'audio',
+          audio_codec: chosenFormat.codec || 'mp3',
+          save_to_sdcard: saveSdcard,
+          title: currentData.title
+        };
+
+        const res = await fetch('/api/download', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || "ডাউনলোড শুরু করা যায়নি");
+
+        trackProgress(data.task_id);
+      } catch (err) {
+        alert("ত্রুটি: " + err.message);
+        startBtn.disabled = false;
+        progressCard.classList.add('hidden');
+      }
+    }
+
+    function trackProgress(taskId) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/progress/${taskId}`);
+          if (!res.ok) return;
+
+          const t = await res.json();
+
+          if (t.status === 'downloading') {
+            document.getElementById('progressStateText').innerText = "ডাউনলোড হচ্ছে...";
+            document.getElementById('progressBarFill').style.width = `${t.progress}%`;
+            document.getElementById('progressPercentText').innerText = `${t.progress}%`;
+            document.getElementById('progressSpeedText').innerText = t.speed;
+            document.getElementById('progressSizeText').innerText = `${t.downloaded_bytes} / ${t.total_bytes}`;
+            document.getElementById('progressEtaText').innerText = t.eta;
+          } else if (t.status === 'processing') {
+            document.getElementById('progressStateText').innerText = "অডিও-ভিডিও মার্জ করা হচ্ছে (FFmpeg)...";
+            document.getElementById('progressBarFill').style.width = "95%";
+            document.getElementById('progressPercentText').innerText = "95%";
+            document.getElementById('progressSpeedText').innerText = "Merging...";
+          } else if (t.status === 'completed') {
+            clearInterval(pollInterval);
+            vibrateDevice([50, 100, 50]);
+            document.getElementById('progressStateText').innerText = "ডাউনলোড সম্পন্ন! 🎉";
+            document.getElementById('progressBarFill').style.width = "100%";
+            document.getElementById('progressPercentText').innerText = "100%";
+            document.getElementById('progressSpeedText').innerText = "Finished";
+            document.getElementById('progressEtaText').innerText = "0s";
+            document.getElementById('startDownloadBtn').disabled = false;
+
+            const downloadUrl = `/api/file/${taskId}`;
+            const link = document.getElementById('directFileHref');
+            link.href = downloadUrl;
+            link.setAttribute('download', t.filename);
+
+            if (t.saved_sdcard_path) {
+              document.getElementById('sdcardSuccessText').innerText = `✅ মোবাইলে সংরক্ষিত: ${t.saved_sdcard_path}`;
+            } else {
+              document.getElementById('sdcardSuccessText').innerText = '';
+            }
+
+            document.getElementById('completedBlock').classList.remove('hidden');
+            // Auto trigger browser download
+            window.location.href = downloadUrl;
+          } else if (t.status === 'error') {
+            clearInterval(pollInterval);
+            document.getElementById('progressStateText').innerText = "ডাউনলোড ব্যর্থ!";
+            document.getElementById('startDownloadBtn').disabled = false;
+            alert("ডাউনলোড ত্রুটি: " + (t.error || "অজ্ঞাত ত্রুটি"));
+          }
+        } catch (e) {
+          console.warn("Poll error", e);
+        }
+      }, 1000);
+    }
+
+    // Transcript Modal Logic
+    async function fetchTranscriptModal() {
+      if (!currentData) return;
+      vibrateDevice(30);
+
+      const modal = document.getElementById('transcriptModal');
+      const body = document.getElementById('transcriptBody');
+      const stats = document.getElementById('transcriptStats');
+
+      modal.classList.remove('hidden');
+      body.innerHTML = '<p class="text-purple-400 font-bold animate-pulse">ভিডিওর সম্পূর্ণ অডিও ও সাবটাইটেল ট্রান্সক্রিপ্ট সংগ্রহ করা হচ্ছে...</p>';
+      stats.innerText = 'অপেক্ষা করুন...';
+
+      try {
+        const res = await fetch('/api/transcript', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ url: currentData.url })
+        });
+        const data = await res.json();
+
+        if (data.found && data.transcript) {
+          currentTranscriptText = data.transcript;
+          stats.innerText = `${data.line_count || 'বহু'} লাইন পাওয়া গেছে (ভাষা: ${data.language || 'স্বয়ংক্রিয়'})`;
+          
+          const lines = data.transcript.split('\n');
+          body.innerHTML = lines.map(line => `<div class="p-1.5 rounded hover:bg-slate-800/60 transition-colors">${line}</div>`).join('');
+        } else {
+          currentTranscriptText = '';
+          body.innerHTML = `<p class="text-amber-400">${data.message || 'এই ভিডিওটিতে কোনো সাবটাইটেল বা ট্রান্সক্রিপ্ট টেক্সট পাওয়া যায়নি।'}</p>`;
+          stats.innerText = '০ লাইন';
+        }
+      } catch (err) {
+        body.innerHTML = `<p class="text-rose-400">ট্রান্সক্রিপ্ট সংগ্রহ করতে সমস্যা হয়েছে: ${err.message}</p>`;
+      }
+    }
+
+    function closeTranscriptModal() {
+      document.getElementById('transcriptModal').classList.add('hidden');
+    }
+
+    function copyTranscriptText() {
+      if (!currentTranscriptText) return;
+      vibrateDevice(30);
+      navigator.clipboard.writeText(currentTranscriptText).then(() => {
+        const btn = document.getElementById('copyTranscriptBtn');
+        btn.innerText = '✅ কপি হয়েছে!';
+        setTimeout(() => { btn.innerText = '📋 কপি করুন (Copy All)'; }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
