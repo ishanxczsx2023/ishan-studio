@@ -9,7 +9,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="icon" type="image/png" href="/static/icon.png">
+  <link rel="icon" type="image/png" href="/static/brand.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -38,7 +38,7 @@
       animation: gold-shimmer 3s infinite;
     }
     .glass-card {
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -55,72 +55,88 @@
   </div>
 
   <!-- Header -->
-  <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30 px-4 py-3">
+  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-4 py-2.5">
     <div class="max-w-2xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-0.5 shadow-lg shadow-purple-500/20 flex items-center justify-center">
-          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-            <span class="text-lg font-black bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">IS</span>
-          </div>
-        </div>
+      <div class="flex items-center space-x-2.5">
+        <img src="static/brand.png" onerror="this.src='brand.png'" alt="Ishan Studio" class="w-9 h-9 rounded-xl object-cover shadow-md shadow-purple-500/20 border border-purple-500/30">
         <div>
           <div class="flex items-center gap-1.5">
             <h1 class="text-base font-extrabold tracking-tight text-white">Ishan Studio</h1>
-            <span class="px-1.5 py-0.2 text-[10px] font-bold rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">PRO 4K</span>
+            <span class="px-1.5 py-0.2 text-[9px] font-black rounded bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 uppercase">PRO 4K</span>
           </div>
-          <p class="text-[11px] text-slate-400">All-in-One Media & Transcript</p>
+          <p class="text-[10px] text-slate-400">All-in-One 4K Media & Transcript</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
         <button 
-          id="installPwaBtn" 
-          onclick="triggerPwaInstall()" 
-          class="hidden px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md shadow-purple-900/40 border border-purple-400/30 flex items-center gap-1.5 transition-all"
+          type="button"
+          onclick="openServerModal()" 
+          id="serverStatusBtn"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all"
         >
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          ইনস্টল করুন
+          <span id="serverDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="serverText">Online</span>
         </button>
-        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          Live
-        </span>
       </div>
     </div>
   </header>
 
+  <!-- Hero Brand Visual Banner -->
+  <div class="max-w-2xl w-full mx-auto px-4 pt-3 pb-1">
+    <div class="relative overflow-hidden rounded-2xl border border-purple-500/30 shadow-2xl bg-gradient-to-b from-purple-950/40 via-slate-900/60 to-slate-950 p-3 sm:p-4 flex flex-col sm:flex-row items-center gap-4">
+      <img src="static/brand.png" onerror="this.src='brand.png'" alt="Ishan Studio Hero" class="w-28 sm:w-36 rounded-xl shadow-lg border border-purple-400/40 shrink-0 object-cover">
+      <div class="space-y-1.5 text-center sm:text-left flex-1">
+        <div class="flex items-center justify-center sm:justify-start gap-2">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">🌟 REAL 4K</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">💧 NO WATERMARK</span>
+        </div>
+        <h2 class="text-lg sm:text-xl font-black text-white">হাই-স্পিড অল-ইন-ওয়ান ডাউনলোডার</h2>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          ইউটিউব ৪কে, ফেসবুক, ইন্সটাগ্রাম রিলস, টিকটক ও পিন্টারেস্ট থেকে সম্পূর্ণ ফ্রিতে যেকোনো ভিডিও এবং ট্রান্সক্রিপ্ট টেক্সট নামিয়ে নিন।
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Top Ad Slot Container (Monetization Placeholder) -->
-  <div class="max-w-2xl w-full mx-auto px-4 pt-3">
-    <div class="w-full bg-slate-900/40 border border-dashed border-slate-800 rounded-xl p-2.5 text-center flex flex-col items-center justify-center">
-      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড বিজ্ঞাপন / Advertisement Slot</span>
-      <div class="h-10 flex items-center justify-center text-xs text-slate-400 font-medium">
-        ✨ Ishan Studio Pro • 4K Downloader & Transcript Engine
+  <div class="max-w-2xl w-full mx-auto px-4 pt-2">
+    <div class="w-full bg-slate-900/40 border border-dashed border-slate-800 rounded-xl p-2 text-center flex flex-col items-center justify-center">
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড বিজ্ঞাপন / ADVERTISEMENT SLOT</span>
+      <div class="h-8 flex items-center justify-center text-xs text-slate-400 font-medium">
+        ✨ Ishan Studio Pro • Fast 4K Downloader Engine
       </div>
     </div>
   </div>
 
   <!-- Main Content -->
-  <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-4 space-y-5">
+  <main class="flex-1 max-w-2xl w-full mx-auto px-4 py-3 space-y-4">
 
-    <!-- Supported Platforms Pill Row -->
-    <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 text-xs">
-      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-red-500/30 flex items-center justify-center gap-1.5 text-slate-200">
-        <span class="w-2 h-2 rounded-full bg-red-500"></span>
-        <span class="font-bold">YouTube (4K)</span>
+    <!-- 6 Supported Platforms Pill Row -->
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-xs">
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-red-500/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">🔴</span>
+        <span class="text-[10px] font-bold">YouTube 4K</span>
       </div>
-      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-pink-500/30 flex items-center justify-center gap-1.5 text-slate-200">
-        <span class="w-2 h-2 rounded-full bg-pink-500"></span>
-        <span class="font-bold">Instagram</span>
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-blue-500/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">🔵</span>
+        <span class="text-[10px] font-bold">Facebook</span>
       </div>
-      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex items-center justify-center gap-1.5 text-slate-200">
-        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-        <span class="font-bold">TikTok</span>
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-pink-500/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">🟣</span>
+        <span class="text-[10px] font-bold">Instagram</span>
       </div>
-      <div class="flex-1 py-2 px-2.5 rounded-xl bg-slate-900/90 border border-rose-600/30 flex items-center justify-center gap-1.5 text-slate-200">
-        <span class="w-2 h-2 rounded-full bg-rose-600"></span>
-        <span class="font-bold">Pinterest</span>
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-cyan-500/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">🟢</span>
+        <span class="text-[10px] font-bold">TikTok</span>
+      </div>
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-slate-600/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">⚪</span>
+        <span class="text-[10px] font-bold">X (Twitter)</span>
+      </div>
+      <div class="py-2 px-1 rounded-xl bg-slate-900/90 border border-rose-600/30 flex flex-col items-center gap-0.5 text-slate-200">
+        <span class="text-sm">📌</span>
+        <span class="text-[10px] font-bold">Pinterest</span>
       </div>
     </div>
 
@@ -141,7 +157,7 @@
           <input 
             type="text" 
             id="urlInput" 
-            placeholder="ইউটিউব, ইন্সটাগ্রাম, টিকটক বা পিন্টারেস্ট লিঙ্ক দিন..." 
+            placeholder="ইউটিউব, ইন্সটাগ্রাম, টিকটক বা ফেসবুক লিঙ্ক পেস্ট করুন..." 
             class="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl pl-3.5 pr-24 py-3 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 text-white placeholder-slate-500 transition-all font-mono"
             oninput="handleInputDetect(this.value)"
           >
@@ -315,15 +331,13 @@
 
     <!-- Native Ad Placement Slot (Bottom) -->
     <div class="w-full bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 text-center space-y-2">
-      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড পার্টনার / Sponsored Slot</span>
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড পার্টনার / SPONSORED PARTNER</span>
       <div class="py-3 px-4 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
         <div class="flex items-center gap-3 text-left">
-          <div class="w-10 h-10 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold">
-            ⚡
-          </div>
+          <img src="static/brand.png" onerror="this.src='brand.png'" alt="Icon" class="w-10 h-10 rounded-xl object-cover border border-purple-500/30">
           <div>
             <h4 class="text-xs font-bold text-white">Ishan Studio Official App</h4>
-            <p class="text-[11px] text-slate-400">Download YouTube 4K, Reels & TikTok effortlessly</p>
+            <p class="text-[11px] text-slate-400">YouTube 4K, Reels & TikTok without watermark</p>
           </div>
         </div>
         <button class="px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-600 text-white hover:bg-purple-500">Open</button>
@@ -363,6 +377,46 @@
     </div>
   </div>
 
+  <!-- Server Config Modal -->
+  <div id="serverModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>⚙️</span> ব্যাকএন্ড সার্ভার কনফিগারেশন
+        </h3>
+        <button onclick="closeServerModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+      <p class="text-xs text-slate-300">
+        ভিডিও প্রসেসিং ইঞ্জিন সার্ভারের URL নির্ধারণ করুন। আপনার নিজের টার্মাক্স লোকাল সার্ভার অথবা ক্লাউড লিঙ্ক ব্যবহার করতে পারেন।
+      </p>
+      <div class="space-y-1.5">
+        <label class="text-[11px] font-bold text-slate-400 uppercase">Server API Endpoint</label>
+        <input 
+          type="text" 
+          id="customServerInput" 
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-purple-500"
+          placeholder="http://127.0.0.1:5000"
+        >
+      </div>
+      <div class="flex items-center justify-between pt-2">
+        <button 
+          type="button" 
+          onclick="setLocalhostServer()" 
+          class="px-3 py-1.5 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300"
+        >
+          Reset to 127.0.0.1:5000
+        </button>
+        <button 
+          type="button" 
+          onclick="saveServerConfig()" 
+          class="px-4 py-1.5 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white"
+        >
+          Save & Test
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="text-center text-xs text-slate-500 py-6">
     <p class="font-semibold text-slate-400">Ishan Studio &bull; Developed for Android & Global Web</p>
     <p class="text-[11px] mt-1 text-slate-600">Built with Python, FFmpeg, yt-dlp & Tailored for high-speed 4K</p>
@@ -374,36 +428,57 @@
     let activeTab = 'video';
     let pollInterval = null;
     let currentTranscriptText = '';
-    let deferredInstallPrompt = null;
 
-    // PWA Install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredInstallPrompt = e;
-      const btn = document.getElementById('installPwaBtn');
-      if (btn) btn.classList.remove('hidden');
-    });
+    // Smart Server URL Manager
+    let API_BASE = localStorage.getItem('ishan_studio_api') || 'http://127.0.0.1:5000';
 
-    function triggerPwaInstall() {
-      if (deferredInstallPrompt) {
-        deferredInstallPrompt.prompt();
-        deferredInstallPrompt.userChoice.then((choice) => {
-          if (choice.outcome === 'accepted') {
-            document.getElementById('installPwaBtn').classList.add('hidden');
-          }
-          deferredInstallPrompt = null;
-        });
+    async function checkServerHealth() {
+      const dot = document.getElementById('serverDot');
+      const text = document.getElementById('serverText');
+      try {
+        const res = await fetch(`${API_BASE}/api/analyze`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ url: '' })
+        }).catch(() => null);
+
+        // 400 is expected for empty URL, meaning server is active!
+        if (res && (res.status === 400 || res.status === 200)) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+          text.innerText = 'Online';
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+          text.innerText = 'Check Server';
+        }
+      } catch (e) {
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+        text.innerText = 'Offline';
       }
     }
+    checkServerHealth();
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/static/sw.js').catch(console.warn);
+    function openServerModal() {
+      document.getElementById('customServerInput').value = API_BASE;
+      document.getElementById('serverModal').classList.remove('hidden');
+    }
+    function closeServerModal() {
+      document.getElementById('serverModal').classList.add('hidden');
+    }
+    function setLocalhostServer() {
+      document.getElementById('customServerInput').value = 'http://127.0.0.1:5000';
+    }
+    function saveServerConfig() {
+      let val = document.getElementById('customServerInput').value.trim();
+      if (!val) val = 'http://127.0.0.1:5000';
+      if (val.endsWith('/')) val = val.slice(0, -1);
+      API_BASE = val;
+      localStorage.setItem('ishan_studio_api', API_BASE);
+      closeServerModal();
+      checkServerHealth();
     }
 
     function vibrateDevice(ms = 30) {
-      if (navigator.vibrate) {
-        navigator.vibrate(ms);
-      }
+      if (navigator.vibrate) navigator.vibrate(ms);
     }
 
     async function handlePaste() {
@@ -416,7 +491,7 @@
           analyzeMedia();
         }
       } catch (err) {
-        alert("ক্লিপবোর্ড থেকে পেস্ট করতে অনুমতি দিন অথবা বক্সে লং-প্রেস করে পেস্ট করুন।");
+        alert("ক্লিপবোর্ড থেকে পেস্ট করতে পারমিশন দিন অথবা বক্সে চেপে ধরে পেস্ট করুন।");
       }
     }
 
@@ -427,6 +502,10 @@
         badge.innerText = 'YouTube 4K';
         badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30';
         badge.classList.remove('hidden');
+      } else if (u.includes('facebook.com') || u.includes('fb.watch')) {
+        badge.innerText = 'Facebook Reel';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30';
+        badge.classList.remove('hidden');
       } else if (u.includes('instagram.com')) {
         badge.innerText = 'Instagram Reel';
         badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30';
@@ -435,8 +514,12 @@
         badge.innerText = 'TikTok No-WM';
         badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
         badge.classList.remove('hidden');
+      } else if (u.includes('twitter.com') || u.includes('x.com')) {
+        badge.innerText = 'X Video';
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-300 border border-slate-500/30';
+        badge.classList.remove('hidden');
       } else if (u.includes('pinterest.com') || u.includes('pin.it')) {
-        badge.innerText = 'Pinterest Video';
+        badge.innerText = 'Pinterest Pin';
         badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30';
         badge.classList.remove('hidden');
       } else {
@@ -462,7 +545,7 @@
       analyzeBtnText.innerText = "অ্যানালাইজ করা হচ্ছে...";
 
       try {
-        const res = await fetch('/api/analyze', {
+        const res = await fetch(`${API_BASE}/api/analyze`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ url })
@@ -476,7 +559,7 @@
         currentData = data;
         renderMediaDetails(data);
       } catch (err) {
-        errorText.innerText = err.message;
+        errorText.innerText = err.message + " (সার্ভার চেক করতে উপরে Online বাটনে চাপুন)";
         errorBox.classList.remove('hidden');
       } finally {
         analyzeBtn.disabled = false;
@@ -533,7 +616,6 @@
         audioGrid.appendChild(btn);
       });
 
-      // Select default (first video option)
       if (data.video_options.length > 0) {
         selectOption(data.video_options[0], 'video_opt_0');
       }
@@ -614,7 +696,7 @@
           title: currentData.title
         };
 
-        const res = await fetch('/api/download', {
+        const res = await fetch(`${API_BASE}/api/download`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(payload)
@@ -636,7 +718,7 @@
 
       pollInterval = setInterval(async () => {
         try {
-          const res = await fetch(`/api/progress/${taskId}`);
+          const res = await fetch(`${API_BASE}/api/progress/${taskId}`);
           if (!res.ok) return;
 
           const t = await res.json();
@@ -663,7 +745,7 @@
             document.getElementById('progressEtaText').innerText = "0s";
             document.getElementById('startDownloadBtn').disabled = false;
 
-            const downloadUrl = `/api/file/${taskId}`;
+            const downloadUrl = `${API_BASE}/api/file/${taskId}`;
             const link = document.getElementById('directFileHref');
             link.href = downloadUrl;
             link.setAttribute('download', t.filename);
@@ -675,7 +757,6 @@
             }
 
             document.getElementById('completedBlock').classList.remove('hidden');
-            // Auto trigger browser download
             window.location.href = downloadUrl;
           } else if (t.status === 'error') {
             clearInterval(pollInterval);
@@ -689,7 +770,6 @@
       }, 1000);
     }
 
-    // Transcript Modal Logic
     async function fetchTranscriptModal() {
       if (!currentData) return;
       vibrateDevice(30);
@@ -703,7 +783,7 @@
       stats.innerText = 'অপেক্ষা করুন...';
 
       try {
-        const res = await fetch('/api/transcript', {
+        const res = await fetch(`${API_BASE}/api/transcript`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ url: currentData.url })

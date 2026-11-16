@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private SwipeRefreshLayout swipeRefresh;
     
-    // Change this to your live server URL or local host
-    public static final String APP_URL = "http://127.0.0.1:5000";
+    // Loads the embedded offline-ready high performance UI
+    public static final String ASSET_URL = "file:///android_asset/index.html";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -45,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
         settings.setSupportZoom(false);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        // Native Android DownloadManager Listener
+        // Native Android DownloadManager integration
         webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                     String cookies = CookieManager.getInstance().getCookie(url);
                     request.addRequestHeader("cookie", cookies);
                     request.addRequestHeader("User-Agent", userAgent);
-                    request.setDescription("Downloading file with Ishan Studio...");
+                    request.setDescription("Ishan Studio ডাউনলোড হচ্ছে...");
                     request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimeType));
                     request.allowScanningByMediaScanner();
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -96,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
         swipeRefresh.setOnRefreshListener(() -> webView.reload());
 
-        // Load the Ishan Studio interface
-        webView.loadUrl(APP_URL);
+        // Always load the embedded instant-launch UI
+        webView.loadUrl(ASSET_URL);
     }
 
     @Override
@@ -112,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
             if (sharedText != null && !sharedText.isEmpty()) {
                 String safeText = sharedText.replace("'", "\\'");
-                webView.evaluateJavascript("if(document.getElementById('urlInput')) { document.getElementById('urlInput').value = '" + safeText + "'; if(typeof analyzeMedia === 'function') analyzeMedia(); }", null);
+                webView.evaluateJavascript("if(document.getElementById('urlInput')) { document.getElementById('urlInput').value = '" + safeText + "'; if(typeof handleInputDetect === 'function') handleInputDetect('" + safeText + "'); if(typeof analyzeMedia === 'function') analyzeMedia(); }", null);
             }
         }
     }
