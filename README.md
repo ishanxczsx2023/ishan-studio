@@ -37,7 +37,20 @@ GitHub Actions স্বয়ংক্রিয়ভাবে লেটেস্ট 
 
 ---
 
+## ☁️ ১-ক্লিকে ফ্রি ক্লাউড ব্যাকএন্ড ডিপ্লয় (Free Cloud 24/7 Hosting)
+
+সারা বিশ্বের বন্ধুদের ব্যবহারের জন্য ২৪/৭ ক্লাউড ব্যাকএন্ড চালু করতে নিচের যেকোনো লিঙ্কে ক্লিক করুন:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/ishanxczsx2023/ishan-studio)
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=ishanxczsx2023/ishan-studio&branch=main&name=ishan-studio)
+
+ডিপ্লয় সম্পন্ন হলে যে URL (যেমন: `https://ishan-studio.onrender.com`) পাওয়া যাবে, সেটি অ্যাপের **Server Settings**-এ একবার দিলেই সবাই কোনো টার্মাক্স ছাড়া সারাবিশ্ব থেকে ভিডিও ডাউনলোড করতে পারবে।
+
+---
+
 ## 🛠️ টেকনোলজি স্ট্যাক
 - **Android App:** Java / Android SDK / Material 3 / Android DownloadManager
 - **Core Engine:** Python 3, Flask, yt-dlp, FFmpeg
 - **Frontend:** Tailwind CSS, Glassmorphic Modern Dark Theme
+

@@ -22,6 +22,31 @@ SDCARD_DOWNLOAD = Path("/sdcard/Download")
 tasks = {}
 tasks_lock = threading.Lock()
 
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        res = Response()
+        res.headers["Access-Control-Allow-Origin"] = "*"
+        res.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization,X-Requested-With"
+        res.headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
+        return res
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization,X-Requested-With"
+    response.headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
+    return response
+
+@app.route("/health", methods=["GET", "OPTIONS"])
+@app.route("/api/health", methods=["GET", "OPTIONS"])
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "app": "Ishan Studio Pro Engine",
+        "version": "1.0.1"
+    }), 200
+
 def detect_platform(url):
     u = url.lower()
     if "youtube.com" in u or "youtu.be" in u:

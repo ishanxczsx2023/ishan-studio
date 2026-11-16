@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ishan-studio
+    runtime: docker
+    plan: free
+    region: oregon
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 10000

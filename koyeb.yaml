@@ -1,0 +1,15 @@
+name: ishan-studio
+services:
+  - name: ishan-studio-backend
+    type: web
+    git:
+      repository: github.com/ishanxczsx2023/ishan-studio
+      branch: main
+    dockerfile: Dockerfile
+    instance_type: nano
+    ports:
+      - port: 5000
+        path: /
+    health_checks:
+      - path: /health
+        port: 5000
