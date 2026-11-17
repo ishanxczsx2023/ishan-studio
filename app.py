@@ -77,6 +77,22 @@ def format_bytes(bytes_count):
         bytes_count /= 1024
     return f"{bytes_count:.1f} TB"
 
+def get_ydl_base_opts():
+    return {
+        "quiet": True,
+        "no_warnings": True,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "ios", "web_creator", "mweb"],
+                "player_skip": ["webpage", "configs"]
+            }
+        },
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9"
+        }
+    }
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -93,11 +109,8 @@ def analyze_url():
 
     platform_name, platform_code = detect_platform(url)
 
-    ydl_opts = {
-        "quiet": True,
-        "no_warnings": True,
-        "skip_download": True,
-    }
+    ydl_opts = get_ydl_base_opts()
+    ydl_opts["skip_download"] = True
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -204,11 +217,8 @@ def get_transcript():
     if not url:
         return jsonify({"error": "ভিডিও লিঙ্ক প্রদান করুন।"}), 400
 
-    ydl_opts = {
-        "quiet": True,
-        "no_warnings": True,
-        "skip_download": True,
-    }
+    ydl_opts = get_ydl_base_opts()
+    ydl_opts["skip_download"] = True
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -339,13 +349,12 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
     safe_title = re.sub(r'[\/:*?"<>|]', '_', title)[:80]
     output_template = str(DOWNLOADS_DIR / f"{task_id}_{safe_title}.%(ext)s")
 
-    ydl_opts = {
+    ydl_opts = get_ydl_base_opts()
+    ydl_opts.update({
         "format": format_spec,
         "outtmpl": output_template,
         "progress_hooks": [progress_hook],
-        "quiet": True,
-        "no_warnings": True,
-    }
+    })
 
     if is_audio:
         ydl_opts["postprocessors"] = [{

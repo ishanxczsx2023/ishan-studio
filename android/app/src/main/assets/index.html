@@ -398,20 +398,29 @@
           placeholder="http://127.0.0.1:5000"
         >
       </div>
-      <div class="flex items-center justify-between pt-2">
-        <button 
-          type="button" 
-          onclick="setLocalhostServer()" 
-          class="px-3 py-1.5 rounded-lg text-xs bg-slate-800 hover:bg-slate-700 text-slate-300"
-        >
-          Reset to 127.0.0.1:5000
-        </button>
+      <div class="space-y-2 pt-2">
+        <div class="flex items-center gap-2">
+          <button 
+            type="button" 
+            onclick="setCloudServer()" 
+            class="flex-1 py-2 rounded-xl text-xs font-bold bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-300 transition-all"
+          >
+            ☁️ Render Cloud (24/7)
+          </button>
+          <button 
+            type="button" 
+            onclick="setLocalhostServer()" 
+            class="flex-1 py-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all"
+          >
+            📱 Localhost (Termux)
+          </button>
+        </div>
         <button 
           type="button" 
           onclick="saveServerConfig()" 
-          class="px-4 py-1.5 rounded-lg text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white"
+          class="w-full py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white shadow-lg shadow-purple-900/30"
         >
-          Save & Test
+          Save & Connect
         </button>
       </div>
     </div>
@@ -430,26 +439,36 @@
     let currentTranscriptText = '';
 
     // Smart Server URL Manager
-    let API_BASE = localStorage.getItem('ishan_studio_api') || 'http://127.0.0.1:5000';
+    const CLOUD_SERVER = 'https://ishan-studio.onrender.com';
+    const LOCAL_SERVER = 'http://127.0.0.1:5000';
+    let API_BASE = localStorage.getItem('ishan_studio_api') || CLOUD_SERVER;
 
     async function checkServerHealth() {
       const dot = document.getElementById('serverDot');
       const text = document.getElementById('serverText');
       try {
-        const res = await fetch(`${API_BASE}/api/analyze`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ url: '' })
-        }).catch(() => null);
+        const res = await fetch(`${API_BASE}/health`, { method: 'GET' }).catch(() => null);
 
-        // 400 is expected for empty URL, meaning server is active!
-        if (res && (res.status === 400 || res.status === 200)) {
+        if (res && res.status === 200) {
           dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
-          text.innerText = 'Online';
-        } else {
-          dot.className = 'w-2 h-2 rounded-full bg-amber-400';
-          text.innerText = 'Check Server';
+          text.innerText = API_BASE.includes('render.com') ? 'Cloud 24/7' : 'Local 5000';
+          return;
         }
+
+        // Auto fallback if local is unreachable
+        if (API_BASE === LOCAL_SERVER) {
+          const cloudRes = await fetch(`${CLOUD_SERVER}/health`).catch(() => null);
+          if (cloudRes && cloudRes.status === 200) {
+            API_BASE = CLOUD_SERVER;
+            localStorage.setItem('ishan_studio_api', CLOUD_SERVER);
+            dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+            text.innerText = 'Cloud 24/7';
+            return;
+          }
+        }
+
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
+        text.innerText = 'Connecting...';
       } catch (e) {
         dot.className = 'w-2 h-2 rounded-full bg-rose-500';
         text.innerText = 'Offline';
@@ -464,12 +483,15 @@
     function closeServerModal() {
       document.getElementById('serverModal').classList.add('hidden');
     }
+    function setCloudServer() {
+      document.getElementById('customServerInput').value = CLOUD_SERVER;
+    }
     function setLocalhostServer() {
-      document.getElementById('customServerInput').value = 'http://127.0.0.1:5000';
+      document.getElementById('customServerInput').value = LOCAL_SERVER;
     }
     function saveServerConfig() {
       let val = document.getElementById('customServerInput').value.trim();
-      if (!val) val = 'http://127.0.0.1:5000';
+      if (!val) val = CLOUD_SERVER;
       if (val.endsWith('/')) val = val.slice(0, -1);
       API_BASE = val;
       localStorage.setItem('ishan_studio_api', API_BASE);

@@ -33,24 +33,25 @@ jobs:
         run: |
           gradle assembleDebug --stacktrace
           mkdir -p ../dist
-          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.1.apk
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.2.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: IshanStudio-v1.0.1-APK
-          path: dist/IshanStudio-v1.0.1.apk
+          name: IshanStudio-v1.0.2-APK
+          path: dist/IshanStudio-v1.0.2.apk
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.1
-          name: Ishan Studio v1.0.1 (Official Android APK)
+          tag_name: v1.0.2
+          name: Ishan Studio v1.0.2 (Official Android APK - 24/7 Cloud Ready)
           body: |
-            🚀 **Ishan Studio v1.0.1 Official Android APK**
+            🚀 **Ishan Studio v1.0.2 Official Android APK (24/7 Global Cloud)**
             
-            ### ✨ Features:
+            ### ✨ Features in v1.0.2:
+            - ☁️ **24/7 Global Cloud Backend Pre-configured**: কোনো টার্মাক্স ছাড়াই বিশ্বের যেকোনো অ্যান্ড্রয়েড ফোনে সরাসরি কাজ করবে!
             - 🔴 **YouTube**: Real 4K Ultra HD (2160p), 1080p & 320kbps MP3
             - 🟣 **Instagram**: Reels & Video Downloader
             - 🟢 **TikTok**: Watermark-Free HD Videos
