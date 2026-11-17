@@ -105,7 +105,7 @@ def analyze_url():
     url = data.get("url", "").strip()
 
     if not url:
-        return jsonify({"error": "অনুগ্রহ করে একটি বৈধ ভিডিও লিঙ্ক পেস্ট করুন।"}), 400
+        return jsonify({"error": "Please paste a valid video URL."}), 400
 
     platform_name, platform_code = detect_platform(url)
 
@@ -116,7 +116,7 @@ def analyze_url():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             if not info:
-                return jsonify({"error": "ভিডিওর তথ্য পাওয়া যায়নি।"}), 404
+                return jsonify({"error": "Unable to retrieve video information. Please verify the link."}), 404
 
             title = info.get("title", "Video")
             uploader = info.get("uploader") or info.get("channel") or info.get("creator") or platform_name
@@ -127,64 +127,86 @@ def analyze_url():
 
             views = f"{info.get('view_count', 0):,}" if info.get("view_count") else "N/A"
             formats = info.get("formats", [])
-            
-            # Available Heights
-            available_heights = {f.get("height") for f in formats if f.get("height")}
             video_options = []
 
-            # Resolution target hierarchy with 60FPS support
-            targets = [
-                {"height": 2160, "label": "4K Ultra HD (2160p)", "badge": "4K REAL", "gold": True},
-                {"height": 1440, "label": "2K Quad HD (1440p)", "badge": "2K HD", "gold": False},
-                {"height": 1080, "label": "Full HD (1080p)", "badge": "1080p", "gold": False},
-                {"height": 720, "label": "High Definition (720p)", "badge": "720p", "gold": False},
-                {"height": 480, "label": "Standard Quality (480p)", "badge": "480p", "gold": False},
-                {"height": 360, "label": "Mobile Saver (360p)", "badge": "360p", "gold": False},
-            ]
+            if platform_code == "youtube":
+                # Available Heights
+                available_heights = {f.get("height") for f in formats if f.get("height")}
 
-            # Detect maximum FPS per height
-            fps_map = {}
-            for f in formats:
-                h = f.get("height")
-                fps = f.get("fps")
-                if h and fps:
-                    fps_map[h] = max(fps_map.get(h, 0), int(fps))
+                # Resolution target hierarchy with 60FPS support
+                targets = [
+                    {"height": 2160, "label": "4K Ultra HD (2160p)", "badge": "4K REAL", "gold": True},
+                    {"height": 1440, "label": "2K Quad HD (1440p)", "badge": "2K HD", "gold": False},
+                    {"height": 1080, "label": "Full HD (1080p)", "badge": "1080p", "gold": False},
+                    {"height": 720, "label": "High Definition (720p)", "badge": "720p", "gold": False},
+                    {"height": 480, "label": "Standard Quality (480p)", "badge": "480p", "gold": False},
+                    {"height": 360, "label": "Mobile Saver (360p)", "badge": "360p", "gold": False},
+                ]
 
-            for target in targets:
-                h = target["height"]
-                if any(curr_h and curr_h >= h for curr_h in available_heights):
-                    max_fps = max([fps_map.get(curr_h, 30) for curr_h in available_heights if curr_h and curr_h >= h] or [30])
-                    fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
-                    fps_badge = f"{target['badge']} {max_fps}FPS" if max_fps >= 50 else target["badge"]
+                # Detect maximum FPS per height
+                fps_map = {}
+                for f in formats:
+                    h = f.get("height")
+                    fps = f.get("fps")
+                    if h and fps:
+                        fps_map[h] = max(fps_map.get(h, 0), int(fps))
 
+                for target in targets:
+                    h = target["height"]
+                    if any(curr_h and curr_h >= h for curr_h in available_heights):
+                        max_fps = max([fps_map.get(curr_h, 30) for curr_h in available_heights if curr_h and curr_h >= h] or [30])
+                        fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
+                        fps_badge = f"{target['badge']} {max_fps}FPS" if max_fps >= 50 else target["badge"]
+
+                        video_options.append({
+                            "type": "video",
+                            "height": h,
+                            "fps": max_fps,
+                            "label": f"{target['label']}{fps_label}",
+                            "badge": fps_badge,
+                            "is_gold": target["gold"],
+                            "ext": "mp4",
+                            "format_spec": f"bestvideo[height<={h}]+bestaudio/best[height<={h}]/best"
+                        })
+
+                if not video_options:
                     video_options.append({
                         "type": "video",
-                        "height": h,
-                        "fps": max_fps,
-                        "label": f"{target['label']}{fps_label}",
-                        "badge": fps_badge,
-                        "is_gold": target["gold"],
+                        "height": 1080,
+                        "label": "Best Available YouTube Quality (MP4)",
+                        "badge": "HD",
+                        "is_gold": False,
                         "ext": "mp4",
-                        "format_spec": f"bestvideo[height<={h}][fps>=50]+bestaudio/bestvideo[height<={h}]+bestaudio/best[height<={h}]/best"
+                        "format_spec": "bestvideo+bestaudio/best"
                     })
-
-            # Default fallback format if no height matched (e.g. TikTok/Instagram/Pinterest)
-            if not video_options:
+            else:
+                # Direct pre-muxed streams for TikTok, Instagram, Facebook, Pinterest, X
                 video_options.append({
                     "type": "video",
                     "height": 1080,
                     "fps": 60,
-                    "label": f"Original Ultra HD {platform_name} Video (60FPS/Max Quality)",
-                    "badge": "MAX HD",
+                    "label": f"Original HD {platform_name} Video (MP4)",
+                    "badge": "ORIGINAL HD",
                     "is_gold": True,
                     "ext": "mp4",
-                    "format_spec": "bestvideo+bestaudio/best"
+                    "format_spec": "best/b"
                 })
+                if platform_code == "facebook":
+                    video_options.append({
+                        "type": "video",
+                        "height": 480,
+                        "fps": 30,
+                        "label": "Standard Quality Video (SD MP4)",
+                        "badge": "SD",
+                        "is_gold": False,
+                        "ext": "mp4",
+                        "format_spec": "worst/b"
+                    })
 
             audio_options = [
                 {
                     "type": "audio",
-                    "label": "Crystal Clear MP3 Audio (320kbps)",
+                    "label": "High Quality MP3 Audio (320kbps)",
                     "badge": "MP3",
                     "ext": "mp3",
                     "codec": "mp3",
@@ -319,7 +341,7 @@ def get_transcript():
             })
 
     except Exception as e:
-        return jsonify({"found": False, "error": str(e), "message": "ট্রান্সক্রিপ্ট সংগ্রহ করতে সমস্যা হয়েছে।"}), 200
+        return jsonify({"found": False, "error": str(e), "message": "No subtitles or transcript found for this video."}), 200
 
 def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_to_sdcard, title):
     import yt_dlp
@@ -345,7 +367,7 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
                 else:
                     speed_str = "0 KB/s"
 
-                eta_str = f"{eta}s" if eta else "হিসাব করা হচ্ছে..."
+                eta_str = f"{eta}s" if eta else "Calculating..."
 
                 task["status"] = "downloading"
                 task["progress"] = pct
@@ -357,20 +379,21 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
             elif d["status"] == "finished":
                 task["status"] = "processing"
                 task["progress"] = 99
-                task["speed"] = "মার্জ করা হচ্ছে (FFmpeg)..."
-                task["eta"] = "কয়েক সেকেন্ড"
+                task["speed"] = "Finalizing (FFmpeg)..."
+                task["eta"] = "Almost done"
 
     safe_title = re.sub(r'[\/:*?"<>|]', '_', title)[:80]
     output_template = str(DOWNLOADS_DIR / f"{task_id}_{safe_title}.%(ext)s")
 
     ydl_opts = get_ydl_base_opts()
     ydl_opts.update({
-        "format": format_spec,
+        "format": format_spec or "best/b",
         "outtmpl": output_template,
         "progress_hooks": [progress_hook],
     })
 
     if is_audio:
+        ydl_opts["format"] = "bestaudio/best"
         ydl_opts["postprocessors"] = [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": audio_codec,
@@ -378,17 +401,34 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
         }]
     else:
         ydl_opts["merge_output_format"] = "mp4"
-        ydl_opts["postprocessor_args"] = {
-            "ffmpeg": ["-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-movflags", "+faststart"]
-        }
+        if "youtube.com" in url.lower() or "youtu.be" in url.lower():
+            ydl_opts["postprocessor_args"] = {
+                "ffmpeg": ["-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-movflags", "+faststart"]
+            }
 
     try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+        except Exception as first_err:
+            err_str = str(first_err).lower()
+            if "format" in err_str or "requested format" in err_str or "extractor" in err_str:
+                # Universal fallback without postprocessor restrictions
+                fallback_opts = get_ydl_base_opts()
+                fallback_opts.update({
+                    "format": "best/b",
+                    "outtmpl": output_template,
+                    "progress_hooks": [progress_hook],
+                    "merge_output_format": "mp4",
+                })
+                with yt_dlp.YoutubeDL(fallback_opts) as ydl:
+                    ydl.download([url])
+            else:
+                raise first_err
 
         files = list(DOWNLOADS_DIR.glob(f"{task_id}_*"))
         if not files:
-            raise Exception("ডাউনলোডকৃত ফাইলটি খুঁজে পাওয়া যায়নি।")
+            raise Exception("Downloaded media file could not be found.")
 
         final_path = files[0]
         final_filename = final_path.name.replace(f"{task_id}_", "")
@@ -411,9 +451,18 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
             tasks[task_id]["saved_sdcard_path"] = saved_sdcard_path
 
     except Exception as e:
+        raw = str(e)
+        if "Blocked" in raw or "blocked" in raw:
+            clean_msg = "Platform temporarily rate-limited this request. Please retry in a few moments."
+        elif "private" in raw.lower():
+            clean_msg = "This video is private or unavailable on the platform."
+        elif "format" in raw.lower():
+            clean_msg = "The requested video format was unavailable. Please try downloading again."
+        else:
+            clean_msg = f"Download error: {raw[:100]}"
         with tasks_lock:
             tasks[task_id]["status"] = "error"
-            tasks[task_id]["error"] = str(e)
+            tasks[task_id]["error"] = clean_msg
 
 @app.route("/api/download", methods=["POST"])
 def start_download():

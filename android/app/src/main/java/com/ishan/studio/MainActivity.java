@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     String cookies = CookieManager.getInstance().getCookie(url);
                     request.addRequestHeader("cookie", cookies);
                     request.addRequestHeader("User-Agent", userAgent);
-                    request.setDescription("Ishan Studio ডাউনলোড হচ্ছে...");
+                    request.setDescription("Downloading via Ishan Studio...");
                     request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimeType));
                     request.allowScanningByMediaScanner();
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
@@ -74,10 +74,10 @@ public class MainActivity extends AppCompatActivity {
                     DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
                     if (dm != null) {
                         dm.enqueue(request);
-                        Toast.makeText(MainActivity.this, "ডাউনলোড শুরু হয়েছে...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Download started...", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "ডাউনলোড ত্রুটি: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Download error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -116,7 +116,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, android.webkit.JsResult result) {
+                Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                result.confirm();
+                return true;
+            }
+        });
 
         swipeRefresh.setOnRefreshListener(() -> webView.reload());
 

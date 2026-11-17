@@ -33,31 +33,31 @@ jobs:
         run: |
           gradle assembleDebug --stacktrace
           mkdir -p ../dist
-          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.4.apk
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.5.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: IshanStudio-v1.0.4-APK
-          path: dist/IshanStudio-v1.0.4.apk
+          name: IshanStudio-v1.0.5-APK
+          path: dist/IshanStudio-v1.0.5.apk
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.4
-          name: Ishan Studio v1.0.4 (Zero Tech UI • Clean Edition)
+          tag_name: v1.0.5
+          name: Ishan Studio v1.0.5 (Full English UI • TikTok & Reels Fix)
           body: |
-            🚀 **Ishan Studio v1.0.4 Official Android APK (Clean Edition)**
+            🚀 **Ishan Studio v1.0.5 Official Android APK (Full English UI)**
             
-            ### ✨ What's New in v1.0.4:
-            - 🔒 **100% Zero-Tech Clean UI**: লোকালহোস্ট, টার্মাক্স বা সার্ভার সেটিংসের জটিলতা সম্পূর্ণ হাইড করা হয়েছে—ইউজাররা শুধু গ্রিন 'Online' বাটন দেখতে পাবে!
-            - 🟢 **Instant Status Toast**: 'Online' বাটনে চাপ দিলে শুধু "সার্ভার অনলাইন" টোস্ট দেখাবে, কোনো কনফিগারেশন পপআপ নয়।
-            - 📋 **Native Android Clipboard**: এক ক্লিকে যেকোনো প্ল্যাটফর্মের লিঙ্ক ইনস্ট্যান্ট পেস্ট!
-            - ⚡ **60 FPS & 4K High Bitrate**: হাই ফ্রেমরেট এবং হাই-কোয়ালিটি অডিও-ভিডিও মার্জিং।
-            - 👑 **Creator Profiles Attached**: ঈশানের Instagram (@ishanxczs26) ও TikTok (@its_ishan_17) অফিশিয়াল ফলো বাটন!
+            ### ✨ What's New in v1.0.5:
+            - 🌐 **100% Clean English UI**: All interfaces, labels, and buttons translated into crisp English per user request.
+            - 📱 **TikTok & Instagram Format Fix**: Robust pre-muxed single-stream format selection (`best/b`) and automatic fallback logic so TikTok and Instagram videos download without `Requested format is not available` errors.
+            - 🚫 **No Browser Alert Dialogs**: Completely removed disruptive `file://` alert popups and replaced them with smooth in-app toasts and styled error status cards.
+            - 📋 **Native Clipboard Integration**: Instant one-tap paste via `@JavascriptInterface` Android bridge without browser permission prompts.
+            - 👑 **Creator Profiles Attached**: Direct verified social follow cards for Ishan's Instagram (@ishanxczs26) and TikTok (@its_ishan_17).
             
-            ডাউনলোড করে যেকোনো অ্যান্ড্রয়েড ফোনে ইনস্টল করুন এবং বন্ধুদের পাঠিয়ে দিন!
+            Download and install on any Android device!
           files: dist/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

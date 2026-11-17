@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn" class="dark">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -91,9 +91,9 @@
           <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">🌟 REAL 4K</span>
           <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">💧 NO WATERMARK</span>
         </div>
-        <h2 class="text-lg sm:text-xl font-black text-white">হাই-স্পিড অল-ইন-ওয়ান ডাউনলোডার</h2>
+        <h2 class="text-lg sm:text-xl font-black text-white">High-Speed All-in-One Downloader</h2>
         <p class="text-xs text-slate-300 leading-relaxed">
-          ইউটিউব ৪কে, ফেসবুক, ইন্সটাগ্রাম রিলস, টিকটক ও পিন্টারেস্ট থেকে সম্পূর্ণ ফ্রিতে যেকোনো ভিডিও এবং ট্রান্সক্রিপ্ট টেক্সট নামিয়ে নিন।
+          Download 4K Ultra HD videos, reels, shorts, and audio transcripts from YouTube, Instagram, TikTok, Facebook, Pinterest & X without watermarks.
         </p>
       </div>
     </div>
@@ -102,7 +102,7 @@
   <!-- Top Ad Slot Container (Monetization Placeholder) -->
   <div class="max-w-2xl w-full mx-auto px-4 pt-2">
     <div class="w-full bg-slate-900/40 border border-dashed border-slate-800 rounded-xl p-2 text-center flex flex-col items-center justify-center">
-      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড বিজ্ঞাপন / ADVERTISEMENT SLOT</span>
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">SPONSORED / ADVERTISEMENT SLOT</span>
       <div class="h-8 flex items-center justify-center text-xs text-slate-400 font-medium">
         ✨ Ishan Studio Pro • Fast 4K Downloader Engine
       </div>
@@ -148,7 +148,7 @@
             <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
             </svg>
-            ভিডিও লিঙ্ক পেস্ট করুন
+            Video Link / URL
           </label>
           <span id="detectedBadge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Detected</span>
         </div>
@@ -157,7 +157,7 @@
           <input 
             type="text" 
             id="urlInput" 
-            placeholder="ইউটিউব, ইন্সটাগ্রাম, টিকটক বা ফেসবুক লিঙ্ক পেস্ট করুন..." 
+            placeholder="Paste YouTube, Instagram, TikTok, Facebook or Pinterest link..." 
             class="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl pl-3.5 pr-24 py-3 text-sm focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 text-white placeholder-slate-500 transition-all font-mono"
             oninput="handleInputDetect(this.value)"
           >
@@ -184,12 +184,12 @@
           <svg id="analyzeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
-          <span id="analyzeBtnText">অ্যানালাইজ ও রেজোলিউশন দেখুন</span>
+          <span id="analyzeBtnText">Analyze & Get Formats</span>
         </button>
       </div>
     </div>
 
-    <!-- Error Alert -->
+    <!-- Error Alert Box -->
     <div id="errorBox" class="hidden bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-sm flex items-start gap-3">
       <svg class="w-5 h-5 text-rose-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -221,7 +221,7 @@
               onclick="fetchTranscriptModal()" 
               class="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 font-bold border border-indigo-500/30 flex items-center gap-1 transition-all"
             >
-              📝 ট্রান্সক্রিপ্ট (Text)
+              📝 Transcript (Text)
             </button>
           </div>
         </div>
@@ -237,7 +237,7 @@
             onclick="setTab('video')" 
             class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg bg-purple-600 text-white shadow transition-all flex items-center justify-center gap-1.5"
           >
-            🎥 ভিডিও (Video MP4)
+            🎥 Video (MP4)
           </button>
           <button 
             type="button" 
@@ -245,7 +245,7 @@
             onclick="setTab('audio')" 
             class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all flex items-center justify-center gap-1.5"
           >
-            🎵 অডিও (MP3 320k)
+            🎵 Audio (MP3 320k)
           </button>
         </div>
 
@@ -263,7 +263,7 @@
         <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-300">
           <label for="saveSdcardCheck" class="flex items-center gap-2 cursor-pointer select-none">
             <input type="checkbox" id="saveSdcardCheck" checked class="w-4 h-4 rounded text-purple-600 bg-slate-950 border-slate-700 focus:ring-purple-500">
-            <span>সরাসরি মোবাইলের স্টোরেজে সেভ করুন (<code class="text-purple-400 font-mono">/sdcard/Download</code>)</span>
+            <span>Direct Save to Device Storage (<code class="text-purple-400 font-mono">/sdcard/Download</code>)</span>
           </label>
         </div>
 
@@ -277,7 +277,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          <span id="downloadBtnText">ডাউনলোড শুরু করুন (Download Now)</span>
+          <span id="downloadBtnText">Download Now</span>
         </button>
       </div>
     </div>
@@ -287,7 +287,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-3 h-3 rounded-full bg-purple-500 animate-ping"></div>
-          <span id="progressStateText" class="font-bold text-sm text-white">ডাউনলোড প্রসেস হচ্ছে...</span>
+          <span id="progressStateText" class="font-bold text-sm text-white">Preparing Download...</span>
         </div>
         <span id="progressPercentText" class="font-mono text-sm font-bold text-purple-400">0%</span>
       </div>
@@ -323,7 +323,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
-          ফাইলটি ফোনে সেভ / ওপেন করুন
+          Open / Save Downloaded File
         </a>
         <p id="sdcardSuccessText" class="text-xs text-center text-emerald-400 font-semibold"></p>
       </div>
@@ -331,7 +331,7 @@
 
     <!-- Native Ad Placement Slot (Bottom) -->
     <div class="w-full bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 text-center space-y-2">
-      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">স্পনসরড পার্টনার / SPONSORED PARTNER</span>
+      <span class="text-[9px] font-bold tracking-widest uppercase text-slate-500">SPONSORED PARTNER</span>
       <div class="py-3 px-4 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between">
         <div class="flex items-center gap-3 text-left">
           <img src="static/brand.png" onerror="this.src='brand.png'" alt="Icon" class="w-10 h-10 rounded-xl object-cover border border-purple-500/30">
@@ -364,7 +364,7 @@
       </div>
 
       <p class="text-xs text-slate-300 leading-relaxed">
-        নতুন সব আপডেট ও যেকোনো প্রয়োজনে সরাসরি যুক্ত থাকতে আমার অফিসিয়াল সোশ্যাল প্রোফাইলে ফলো করুন:
+        Follow my official social channels for feature updates, news, and direct support:
       </p>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
@@ -427,14 +427,14 @@
       <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
         <div class="flex items-center gap-2">
           <span class="text-base">📝</span>
-          <h3 class="font-bold text-sm text-white">ভিডিও ট্রান্সক্রিপ্ট (Full Transcript)</h3>
+          <h3 class="font-bold text-sm text-white">Video Audio Transcript</h3>
         </div>
         <button onclick="closeTranscriptModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center">✕</button>
       </div>
 
       <!-- Modal Body -->
       <div class="p-4 overflow-y-auto flex-1 font-mono text-xs leading-relaxed text-slate-300 space-y-2" id="transcriptBody">
-        <p class="text-slate-500">লোড হচ্ছে...</p>
+        <p class="text-slate-500">Loading transcript...</p>
       </div>
 
       <!-- Modal Footer -->
@@ -445,13 +445,11 @@
           onclick="copyTranscriptText()" 
           class="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 shadow"
         >
-          📋 কপি করুন (Copy All)
+          📋 Copy All
         </button>
       </div>
     </div>
   </div>
-
-
 
   <footer class="text-center text-xs text-slate-500 py-6">
     <p class="font-semibold text-slate-400">Ishan Studio &bull; Developed for Android & Global Web</p>
@@ -506,7 +504,7 @@
     function handleServerStatusClick() {
       vibrateDevice(25);
       checkServerHealth();
-      showToast("সার্ভার অনলাইন (High-Speed Engine Active)");
+      showToast("Server Online (High-Speed Engine Active)");
     }
 
     function vibrateDevice(ms = 30) {
@@ -519,14 +517,14 @@
 
       const toast = document.createElement('div');
       toast.id = 'ishanToast';
-      toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 border border-purple-500/50 text-white text-xs px-4 py-2.5 rounded-full shadow-2xl shadow-purple-900/50 flex items-center gap-2 backdrop-blur-md transition-all font-semibold';
+      toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 border border-purple-500/50 text-white text-xs px-4 py-2.5 rounded-full shadow-2xl shadow-purple-900/50 flex items-center gap-2 backdrop-blur-md transition-all font-semibold max-w-[90vw] text-center';
       toast.innerHTML = `<span>✨</span><span>${msg}</span>`;
       document.body.appendChild(toast);
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transition = 'opacity 0.4s ease';
         setTimeout(() => toast.remove(), 400);
-      }, 2600);
+      }, 3000);
     }
 
     function handleSocialClick(url, event) {
@@ -563,11 +561,11 @@
         document.getElementById('urlInput').value = clean;
         handleInputDetect(clean);
         analyzeMedia();
-        showToast("লিঙ্ক সফলভাবে পেস্ট হয়েছে!");
+        showToast("Link pasted successfully!");
       } else {
         const input = document.getElementById('urlInput');
         input.focus();
-        showToast("ক্লিপবোর্ডে লিঙ্ক নেই, বক্সে চেপে ধরে পেস্ট করুন");
+        showToast("Clipboard empty. Long-press input box to paste.");
       }
     }
 
@@ -618,7 +616,7 @@
 
       vibrateDevice(30);
       analyzeBtn.disabled = true;
-      analyzeBtnText.innerText = "অ্যানালাইজ করা হচ্ছে...";
+      analyzeBtnText.innerText = "Analyzing Media...";
 
       try {
         const res = await fetch(`${API_BASE}/api/analyze`, {
@@ -629,17 +627,17 @@
         const data = await res.json();
 
         if (!res.ok || data.error) {
-          throw new Error(data.error || 'ভিডিও তথ্য সংগ্রহ করা সম্ভব হয়নি।');
+          throw new Error(data.error || 'Failed to fetch video details.');
         }
 
         currentData = data;
         renderMediaDetails(data);
       } catch (err) {
-        errorText.innerText = err.message + " (সার্ভার চেক করতে উপরে Online বাটনে চাপুন)";
+        errorText.innerText = err.message;
         errorBox.classList.remove('hidden');
       } finally {
         analyzeBtn.disabled = false;
-        analyzeBtnText.innerText = "অ্যানালাইজ ও রেজোলিউশন দেখুন";
+        analyzeBtnText.innerText = "Analyze & Get Formats";
       }
     }
 
@@ -752,13 +750,16 @@
       const progressCard = document.getElementById('progressCard');
       const startBtn = document.getElementById('startDownloadBtn');
       const completedBlock = document.getElementById('completedBlock');
+      const errorBox = document.getElementById('errorBox');
+      const errorText = document.getElementById('errorText');
 
+      errorBox.classList.add('hidden');
       startBtn.disabled = true;
       completedBlock.classList.add('hidden');
       progressCard.classList.remove('hidden');
       progressCard.scrollIntoView({ behavior: 'smooth' });
 
-      document.getElementById('progressStateText').innerText = "ডাউনলোড প্রস্তুতি চলছে...";
+      document.getElementById('progressStateText').innerText = "Preparing Download...";
       document.getElementById('progressBarFill').style.width = "5%";
       document.getElementById('progressPercentText').innerText = "5%";
 
@@ -779,11 +780,13 @@
         });
 
         const data = await res.json();
-        if (!res.ok || data.error) throw new Error(data.error || "ডাউনলোড শুরু করা যায়নি");
+        if (!res.ok || data.error) throw new Error(data.error || "Failed to initialize download");
 
         trackProgress(data.task_id);
       } catch (err) {
-        alert("ত্রুটি: " + err.message);
+        showToast("Error: " + err.message);
+        errorText.innerText = err.message;
+        errorBox.classList.remove('hidden');
         startBtn.disabled = false;
         progressCard.classList.add('hidden');
       }
@@ -800,21 +803,21 @@
           const t = await res.json();
 
           if (t.status === 'downloading') {
-            document.getElementById('progressStateText').innerText = "ডাউনলোড হচ্ছে...";
+            document.getElementById('progressStateText').innerText = "Downloading Media...";
             document.getElementById('progressBarFill').style.width = `${t.progress}%`;
             document.getElementById('progressPercentText').innerText = `${t.progress}%`;
             document.getElementById('progressSpeedText').innerText = t.speed;
             document.getElementById('progressSizeText').innerText = `${t.downloaded_bytes} / ${t.total_bytes}`;
             document.getElementById('progressEtaText').innerText = t.eta;
           } else if (t.status === 'processing') {
-            document.getElementById('progressStateText').innerText = "অডিও-ভিডিও মার্জ করা হচ্ছে (FFmpeg)...";
+            document.getElementById('progressStateText').innerText = "Finalizing & Merging (FFmpeg)...";
             document.getElementById('progressBarFill').style.width = "95%";
             document.getElementById('progressPercentText').innerText = "95%";
             document.getElementById('progressSpeedText').innerText = "Merging...";
           } else if (t.status === 'completed') {
             clearInterval(pollInterval);
             vibrateDevice([50, 100, 50]);
-            document.getElementById('progressStateText').innerText = "ডাউনলোড সম্পন্ন! 🎉";
+            document.getElementById('progressStateText').innerText = "Download Complete! 🎉";
             document.getElementById('progressBarFill').style.width = "100%";
             document.getElementById('progressPercentText').innerText = "100%";
             document.getElementById('progressSpeedText').innerText = "Finished";
@@ -827,18 +830,26 @@
             link.setAttribute('download', t.filename);
 
             if (t.saved_sdcard_path) {
-              document.getElementById('sdcardSuccessText').innerText = `✅ মোবাইলে সংরক্ষিত: ${t.saved_sdcard_path}`;
+              document.getElementById('sdcardSuccessText').innerText = `✅ Saved to Device: ${t.saved_sdcard_path}`;
             } else {
               document.getElementById('sdcardSuccessText').innerText = '';
             }
 
             document.getElementById('completedBlock').classList.remove('hidden');
+            showToast("Download Complete!");
             window.location.href = downloadUrl;
           } else if (t.status === 'error') {
             clearInterval(pollInterval);
-            document.getElementById('progressStateText').innerText = "ডাউনলোড ব্যর্থ!";
+            document.getElementById('progressStateText').innerText = "Download Failed";
             document.getElementById('startDownloadBtn').disabled = false;
-            alert("ডাউনলোড ত্রুটি: " + (t.error || "অজ্ঞাত ত্রুটি"));
+            const cleanErr = t.error || "Unable to download video format";
+            showToast(cleanErr);
+            const errorBox = document.getElementById('errorBox');
+            const errorText = document.getElementById('errorText');
+            if (errorBox && errorText) {
+              errorText.innerText = cleanErr;
+              errorBox.classList.remove('hidden');
+            }
           }
         } catch (e) {
           console.warn("Poll error", e);
@@ -855,8 +866,8 @@
       const stats = document.getElementById('transcriptStats');
 
       modal.classList.remove('hidden');
-      body.innerHTML = '<p class="text-purple-400 font-bold animate-pulse">ভিডিওর সম্পূর্ণ অডিও ও সাবটাইটেল ট্রান্সক্রিপ্ট সংগ্রহ করা হচ্ছে...</p>';
-      stats.innerText = 'অপেক্ষা করুন...';
+      body.innerHTML = '<p class="text-purple-400 font-bold animate-pulse">Extracting audio subtitles and transcript...</p>';
+      stats.innerText = 'Extracting...';
 
       try {
         const res = await fetch(`${API_BASE}/api/transcript`, {
@@ -868,17 +879,17 @@
 
         if (data.found && data.transcript) {
           currentTranscriptText = data.transcript;
-          stats.innerText = `${data.line_count || 'বহু'} লাইন পাওয়া গেছে (ভাষা: ${data.language || 'স্বয়ংক্রিয়'})`;
+          stats.innerText = `${data.line_count || 'Multiple'} lines (Language: ${data.language || 'Auto'})`;
           
           const lines = data.transcript.split('\n');
           body.innerHTML = lines.map(line => `<div class="p-1.5 rounded hover:bg-slate-800/60 transition-colors">${line}</div>`).join('');
         } else {
           currentTranscriptText = '';
-          body.innerHTML = `<p class="text-amber-400">${data.message || 'এই ভিডিওটিতে কোনো সাবটাইটেল বা ট্রান্সক্রিপ্ট টেক্সট পাওয়া যায়নি।'}</p>`;
-          stats.innerText = '০ লাইন';
+          body.innerHTML = `<p class="text-amber-400">${data.message || 'No subtitles or transcript found for this video.'}</p>`;
+          stats.innerText = '0 lines';
         }
       } catch (err) {
-        body.innerHTML = `<p class="text-rose-400">ট্রান্সক্রিপ্ট সংগ্রহ করতে সমস্যা হয়েছে: ${err.message}</p>`;
+        body.innerHTML = `<p class="text-rose-400">Failed to load transcript: ${err.message}</p>`;
       }
     }
 
@@ -891,8 +902,8 @@
       vibrateDevice(30);
       navigator.clipboard.writeText(currentTranscriptText).then(() => {
         const btn = document.getElementById('copyTranscriptBtn');
-        btn.innerText = '✅ কপি হয়েছে!';
-        setTimeout(() => { btn.innerText = '📋 কপি করুন (Copy All)'; }, 2000);
+        btn.innerText = '✅ Copied!';
+        setTimeout(() => { btn.innerText = '📋 Copy All'; }, 2000);
       });
     }
   </script>
