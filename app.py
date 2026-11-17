@@ -132,7 +132,7 @@ def analyze_url():
             available_heights = {f.get("height") for f in formats if f.get("height")}
             video_options = []
 
-            # Resolution target hierarchy
+            # Resolution target hierarchy with 60FPS support
             targets = [
                 {"height": 2160, "label": "4K Ultra HD (2160p)", "badge": "4K REAL", "gold": True},
                 {"height": 1440, "label": "2K Quad HD (1440p)", "badge": "2K HD", "gold": False},
@@ -142,17 +142,30 @@ def analyze_url():
                 {"height": 360, "label": "Mobile Saver (360p)", "badge": "360p", "gold": False},
             ]
 
+            # Detect maximum FPS per height
+            fps_map = {}
+            for f in formats:
+                h = f.get("height")
+                fps = f.get("fps")
+                if h and fps:
+                    fps_map[h] = max(fps_map.get(h, 0), int(fps))
+
             for target in targets:
                 h = target["height"]
                 if any(curr_h and curr_h >= h for curr_h in available_heights):
+                    max_fps = max([fps_map.get(curr_h, 30) for curr_h in available_heights if curr_h and curr_h >= h] or [30])
+                    fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
+                    fps_badge = f"{target['badge']} {max_fps}FPS" if max_fps >= 50 else target["badge"]
+
                     video_options.append({
                         "type": "video",
                         "height": h,
-                        "label": target["label"],
-                        "badge": target["badge"],
+                        "fps": max_fps,
+                        "label": f"{target['label']}{fps_label}",
+                        "badge": fps_badge,
                         "is_gold": target["gold"],
                         "ext": "mp4",
-                        "format_spec": f"bestvideo[height<={h}]+bestaudio/best[height<={h}]"
+                        "format_spec": f"bestvideo[height<={h}][fps>=50]+bestaudio/bestvideo[height<={h}]+bestaudio/best[height<={h}]/best"
                     })
 
             # Default fallback format if no height matched (e.g. TikTok/Instagram/Pinterest)
@@ -160,9 +173,10 @@ def analyze_url():
                 video_options.append({
                     "type": "video",
                     "height": 1080,
-                    "label": f"Best Quality {platform_name} Video (MP4)",
-                    "badge": "HD",
-                    "is_gold": False,
+                    "fps": 60,
+                    "label": f"Original Ultra HD {platform_name} Video (60FPS/Max Quality)",
+                    "badge": "MAX HD",
+                    "is_gold": True,
                     "ext": "mp4",
                     "format_spec": "bestvideo+bestaudio/best"
                 })
@@ -364,6 +378,9 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
         }]
     else:
         ydl_opts["merge_output_format"] = "mp4"
+        ydl_opts["postprocessor_args"] = {
+            "ffmpeg": ["-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-movflags", "+faststart"]
+        }
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

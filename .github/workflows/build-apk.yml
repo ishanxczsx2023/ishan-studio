@@ -33,31 +33,29 @@ jobs:
         run: |
           gradle assembleDebug --stacktrace
           mkdir -p ../dist
-          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.2.apk
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.3.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: IshanStudio-v1.0.2-APK
-          path: dist/IshanStudio-v1.0.2.apk
+          name: IshanStudio-v1.0.3-APK
+          path: dist/IshanStudio-v1.0.3.apk
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.2
-          name: Ishan Studio v1.0.2 (Official Android APK - 24/7 Cloud Ready)
+          tag_name: v1.0.3
+          name: Ishan Studio v1.0.3 (Official Ultra Edition)
           body: |
-            🚀 **Ishan Studio v1.0.2 Official Android APK (24/7 Global Cloud)**
+            🚀 **Ishan Studio v1.0.3 Official Android APK (Ultra Edition)**
             
-            ### ✨ Features in v1.0.2:
-            - ☁️ **24/7 Global Cloud Backend Pre-configured**: কোনো টার্মাক্স ছাড়াই বিশ্বের যেকোনো অ্যান্ড্রয়েড ফোনে সরাসরি কাজ করবে!
-            - 🔴 **YouTube**: Real 4K Ultra HD (2160p), 1080p & 320kbps MP3
-            - 🟣 **Instagram**: Reels & Video Downloader
-            - 🟢 **TikTok**: Watermark-Free HD Videos
-            - 🔴 **Pinterest**: Video Pins Downloader
-            - 📝 **Full Video Transcript Generator**
-            - 📱 **Native Android DownloadManager**
+            ### ✨ What's New in v1.0.3:
+            - 📋 **Native Android Clipboard Bridge**: এক ক্লিকে সরাসরি পেস্ট—কোনো পারমিশন এরর বা পপআপ ছাড়াই ইনস্ট্যান্ট পেস্ট!
+            - ⚡ **60 FPS & Lossless High Bitrate**: আসল ৬০ এফপিএস এবং হাই-বিটরেট ক্রিস্টাল ক্লিয়ার অডিও-ভিডিও মার্জিং!
+            - 👑 **Creator Profiles Attached**: ঈশানের অফিশিয়াল Instagram (@ishanxczs26) ও TikTok (@its_ishan_17) প্রোফাইল ফলো সেকশন!
+            - 🟢 **Clean Online Status**: টেকনিক্যাল লেখা সরিয়ে ক্লিন গ্রিন 'Online' স্ট্যাটাস!
+            - ☁️ **24/7 Global Cloud Engine**: সারাবিশ্ব থেকে যেকোনো অ্যান্ড্রয়েড ডিভাইসে সরাসরি সচল!
             
             ডাউনলোড করে যেকোনো অ্যান্ড্রয়েড ফোনে ইনস্টল করুন এবং বন্ধুদের পাঠিয়ে দিন!
           files: dist/*.apk
