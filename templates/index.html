@@ -70,10 +70,10 @@
 
       <div class="flex items-center gap-2">
         <button 
-          type="button"
-          onclick="openServerModal()" 
-          id="serverStatusBtn"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all"
+          type="button" 
+          onclick="handleServerStatusClick()" 
+          id="serverStatusBtn" 
+          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all active:scale-95"
         >
           <span id="serverDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span id="serverText">Online</span>
@@ -451,54 +451,7 @@
     </div>
   </div>
 
-  <!-- Server Config Modal -->
-  <div id="serverModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-          <span>⚙️</span> ব্যাকএন্ড সার্ভার কনফিগারেশন
-        </h3>
-        <button onclick="closeServerModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
-      </div>
-      <p class="text-xs text-slate-300">
-        ভিডিও প্রসেসিং ইঞ্জিন সার্ভারের URL নির্ধারণ করুন। আপনার নিজের টার্মাক্স লোকাল সার্ভার অথবা ক্লাউড লিঙ্ক ব্যবহার করতে পারেন।
-      </p>
-      <div class="space-y-1.5">
-        <label class="text-[11px] font-bold text-slate-400 uppercase">Server API Endpoint</label>
-        <input 
-          type="text" 
-          id="customServerInput" 
-          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-purple-500"
-          placeholder="http://127.0.0.1:5000"
-        >
-      </div>
-      <div class="space-y-2 pt-2">
-        <div class="flex items-center gap-2">
-          <button 
-            type="button" 
-            onclick="setCloudServer()" 
-            class="flex-1 py-2 rounded-xl text-xs font-bold bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-300 transition-all"
-          >
-            ☁️ Render Cloud (24/7)
-          </button>
-          <button 
-            type="button" 
-            onclick="setLocalhostServer()" 
-            class="flex-1 py-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all"
-          >
-            📱 Localhost (Termux)
-          </button>
-        </div>
-        <button 
-          type="button" 
-          onclick="saveServerConfig()" 
-          class="w-full py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 text-white shadow-lg shadow-purple-900/30"
-        >
-          Save & Connect
-        </button>
-      </div>
-    </div>
-  </div>
+
 
   <footer class="text-center text-xs text-slate-500 py-6">
     <p class="font-semibold text-slate-400">Ishan Studio &bull; Developed for Android & Global Web</p>
@@ -550,28 +503,10 @@
     }
     checkServerHealth();
 
-    function openServerModal() {
-      document.getElementById('customServerInput').value = API_BASE;
-      document.getElementById('serverModal').classList.remove('hidden');
-    }
-    function closeServerModal() {
-      document.getElementById('serverModal').classList.add('hidden');
-    }
-    function setCloudServer() {
-      document.getElementById('customServerInput').value = CLOUD_SERVER;
-    }
-    function setLocalhostServer() {
-      document.getElementById('customServerInput').value = LOCAL_SERVER;
-    }
-    function saveServerConfig() {
-      let val = document.getElementById('customServerInput').value.trim();
-      if (!val) val = CLOUD_SERVER;
-      if (val.endsWith('/')) val = val.slice(0, -1);
-      API_BASE = val;
-      localStorage.setItem('ishan_studio_api', API_BASE);
-      closeServerModal();
+    function handleServerStatusClick() {
+      vibrateDevice(25);
       checkServerHealth();
-      showToast("সার্ভার কনফিগারেশন সংরক্ষিত হয়েছে!");
+      showToast("সার্ভার অনলাইন (High-Speed Engine Active)");
     }
 
     function vibrateDevice(ms = 30) {
