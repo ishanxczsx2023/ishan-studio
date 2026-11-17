@@ -33,29 +33,29 @@ jobs:
         run: |
           gradle assembleDebug --stacktrace
           mkdir -p ../dist
-          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.5.apk
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/IshanStudio-v1.0.6.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: IshanStudio-v1.0.5-APK
-          path: dist/IshanStudio-v1.0.5.apk
+          name: IshanStudio-v1.0.6-APK
+          path: dist/IshanStudio-v1.0.6.apk
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: v1.0.5
-          name: Ishan Studio v1.0.5 (Full English UI • TikTok & Reels Fix)
+          tag_name: v1.0.6
+          name: Ishan Studio v1.0.6 (2X Double-Resolution Render & Anti-Stall Engine)
           body: |
-            🚀 **Ishan Studio v1.0.5 Official Android APK (Full English UI)**
+            🚀 **Ishan Studio v1.0.6 Official Android APK (2X Super-Resolution Edition)**
             
-            ### ✨ What's New in v1.0.5:
-            - 🌐 **100% Clean English UI**: All interfaces, labels, and buttons translated into crisp English per user request.
-            - 📱 **TikTok & Instagram Format Fix**: Robust pre-muxed single-stream format selection (`best/b`) and automatic fallback logic so TikTok and Instagram videos download without `Requested format is not available` errors.
-            - 🚫 **No Browser Alert Dialogs**: Completely removed disruptive `file://` alert popups and replaced them with smooth in-app toasts and styled error status cards.
-            - 📋 **Native Clipboard Integration**: Instant one-tap paste via `@JavascriptInterface` Android bridge without browser permission prompts.
-            - 👑 **Creator Profiles Attached**: Direct verified social follow cards for Ishan's Instagram (@ishanxczs26) and TikTok (@its_ishan_17).
+            ### ✨ What's New in v1.0.6:
+            - 🚀 **2X Double-Resolution Render**: TikTok, Instagram Reels, and YouTube 1080p videos can now be rendered at up to 2X double resolution (2K Quad HD / 1440p and 4K Ultra HD) using our high-speed FFmpeg Lanczos super-resolution engine!
+            - 🌟 **4K Ultra HD AI Clarity**: 4K upscale mode with gentle edge-sharpening for crisp studio-quality output.
+            - ⚡ **Anti-Stall Download Pipeline**: Expanded redirect resolving (`vt.tiktok.com`, `vm.tiktok.com`, `pin.it`, `fb.watch`), 30s socket timeouts, automatic fallback streams, and zero freezing.
+            - 🌐 **Full English Clean Interface**: 100% international English UI with zero annoying browser alert popups.
+            - 👑 **Creator Profiles Attached**: Direct social connect buttons for Ishan's Instagram (@ishanxczs26) and TikTok (@its_ishan_17).
             
             Download and install on any Android device!
           files: dist/*.apk

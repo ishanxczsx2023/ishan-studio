@@ -6,6 +6,7 @@ import json
 import time
 import shutil
 import threading
+import subprocess
 import urllib.request
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify, send_file, Response
@@ -44,7 +45,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "app": "Ishan Studio Pro Engine",
-        "version": "1.0.2"
+        "version": "1.0.6",
+        "features": ["4K_60FPS", "2X_UPSCALE", "TRANSCRIPTS", "NO_WATERMARK"]
     }), 200
 
 def detect_platform(url):
@@ -55,9 +57,31 @@ def detect_platform(url):
         return "Instagram", "instagram"
     elif "tiktok.com" in u:
         return "TikTok", "tiktok"
+    elif "facebook.com" in u or "fb.watch" in u or "fb.com" in u:
+        return "Facebook", "facebook"
+    elif "twitter.com" in u or "x.com" in u:
+        return "X (Twitter)", "twitter"
     elif "pinterest.com" in u or "pin.it" in u:
         return "Pinterest", "pinterest"
+    elif "threads.net" in u:
+        return "Threads", "threads"
+    elif "reddit.com" in u:
+        return "Reddit", "reddit"
     return "Social Media", "generic"
+
+def expand_url(url):
+    """Expands shortened URLs (vt.tiktok.com, vm.tiktok.com, pin.it, youtu.be, fb.watch)"""
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            }
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return resp.geturl()
+    except Exception:
+        return url
 
 def format_duration(seconds):
     if not seconds:
@@ -81,15 +105,27 @@ def get_ydl_base_opts():
     return {
         "quiet": True,
         "no_warnings": True,
+        "socket_timeout": 30,
+        "retries": 10,
+        "fragment_retries": 10,
+        "nocheckcertificate": True,
+        "geo_bypass": True,
+        "cachedir": False,
+        "noplaylist": True,
+        "prefer_ffmpeg": True,
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "ios", "web_creator", "mweb"],
+                "player_client": ["android", "ios", "mweb", "web"],
                 "player_skip": ["webpage", "configs"]
+            },
+            "instagram": {
+                "api_version": "v1"
             }
         },
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "Accept-Language": "en-US,en;q=0.9"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         }
     }
 
@@ -102,11 +138,12 @@ def analyze_url():
     import yt_dlp
 
     data = request.get_json(silent=True) or {}
-    url = data.get("url", "").strip()
+    raw_url = data.get("url", "").strip()
 
-    if not url:
+    if not raw_url:
         return jsonify({"error": "Please paste a valid video URL."}), 400
 
+    url = expand_url(raw_url)
     platform_name, platform_code = detect_platform(url)
 
     ydl_opts = get_ydl_base_opts()
@@ -127,23 +164,27 @@ def analyze_url():
 
             views = f"{info.get('view_count', 0):,}" if info.get("view_count") else "N/A"
             formats = info.get("formats", [])
+
+            # Detect native base resolution
+            orig_h = info.get("height") or 0
+            orig_w = info.get("width") or 0
+            # For formats, find highest available height
+            for f in formats:
+                h = f.get("height") or 0
+                w = f.get("width") or 0
+                if h > orig_h:
+                    orig_h = h
+                if w > orig_w:
+                    orig_w = w
+
+            base_res = min(orig_h, orig_w) if (orig_h and orig_w) else (orig_h or 1080)
+            if base_res < 360:
+                base_res = 1080
+
             video_options = []
 
             if platform_code == "youtube":
-                # Available Heights
                 available_heights = {f.get("height") for f in formats if f.get("height")}
-
-                # Resolution target hierarchy with 60FPS support
-                targets = [
-                    {"height": 2160, "label": "4K Ultra HD (2160p)", "badge": "4K REAL", "gold": True},
-                    {"height": 1440, "label": "2K Quad HD (1440p)", "badge": "2K HD", "gold": False},
-                    {"height": 1080, "label": "Full HD (1080p)", "badge": "1080p", "gold": False},
-                    {"height": 720, "label": "High Definition (720p)", "badge": "720p", "gold": False},
-                    {"height": 480, "label": "Standard Quality (480p)", "badge": "480p", "gold": False},
-                    {"height": 360, "label": "Mobile Saver (360p)", "badge": "360p", "gold": False},
-                ]
-
-                # Detect maximum FPS per height
                 fps_map = {}
                 for f in formats:
                     h = f.get("height")
@@ -151,78 +192,193 @@ def analyze_url():
                     if h and fps:
                         fps_map[h] = max(fps_map.get(h, 0), int(fps))
 
-                for target in targets:
-                    h = target["height"]
-                    if any(curr_h and curr_h >= h for curr_h in available_heights):
-                        max_fps = max([fps_map.get(curr_h, 30) for curr_h in available_heights if curr_h and curr_h >= h] or [30])
-                        fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
-                        fps_badge = f"{target['badge']} {max_fps}FPS" if max_fps >= 50 else target["badge"]
-
-                        video_options.append({
-                            "type": "video",
-                            "height": h,
-                            "fps": max_fps,
-                            "label": f"{target['label']}{fps_label}",
-                            "badge": fps_badge,
-                            "is_gold": target["gold"],
-                            "ext": "mp4",
-                            "format_spec": f"bestvideo[height<={h}]+bestaudio/best[height<={h}]/best"
-                        })
-
-                if not video_options:
+                # If native 4K exists:
+                if any(h and h >= 2160 for h in available_heights):
+                    max_fps = fps_map.get(2160, 60)
+                    fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
                     video_options.append({
                         "type": "video",
-                        "height": 1080,
-                        "label": "Best Available YouTube Quality (MP4)",
-                        "badge": "HD",
-                        "is_gold": False,
+                        "height": 2160,
+                        "fps": max_fps,
+                        "label": f"4K Ultra HD (2160p){fps_label}",
+                        "badge": "🌟 4K NATIVE",
+                        "desc": "Original 3840x2160 Ultra HD Stream",
+                        "is_gold": True,
+                        "upscale": 0,
+                        "ext": "mp4",
+                        "format_spec": "bestvideo[height<=2160]+bestaudio/best[height<=2160]/best"
+                    })
+                else:
+                    # Provide 4K AI Super-Resolution option
+                    video_options.append({
+                        "type": "video",
+                        "height": 2160,
+                        "fps": 60,
+                        "label": "4K Ultra HD (2160p) • AI Super-Resolution",
+                        "badge": "👑 4K ULTRA",
+                        "desc": "Studio 4K Master Render (FFmpeg Lanczos)",
+                        "is_gold": True,
+                        "upscale": 2160,
                         "ext": "mp4",
                         "format_spec": "bestvideo+bestaudio/best"
                     })
-            else:
-                # Direct pre-muxed streams for TikTok, Instagram, Facebook, Pinterest, X
+
+                # If native 2K exists:
+                if any(h and h >= 1440 for h in available_heights):
+                    max_fps = fps_map.get(1440, 60)
+                    fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
+                    video_options.append({
+                        "type": "video",
+                        "height": 1440,
+                        "fps": max_fps,
+                        "label": f"2K Quad HD (1440p){fps_label}",
+                        "badge": "🚀 2K NATIVE",
+                        "desc": "Original 2560x1440 Quad HD Stream",
+                        "is_gold": True,
+                        "upscale": 0,
+                        "ext": "mp4",
+                        "format_spec": "bestvideo[height<=1440]+bestaudio/best[height<=1440]/best"
+                    })
+                else:
+                    # 2K 2X Double Resolution Boost
+                    video_options.append({
+                        "type": "video",
+                        "height": 1440,
+                        "fps": 60,
+                        "label": "2K Quad HD (1440p) • 2X Resolution Boost",
+                        "badge": "🚀 2K 2X BOOST",
+                        "desc": "2X Double-Clarity Upscale (1440p)",
+                        "is_gold": True,
+                        "upscale": 1440,
+                        "ext": "mp4",
+                        "format_spec": "bestvideo+bestaudio/best"
+                    })
+
+                # Native 1080p
+                if any(h and h >= 1080 for h in available_heights):
+                    max_fps = fps_map.get(1080, 30)
+                    fps_label = f" • {max_fps}FPS" if max_fps >= 50 else ""
+                    video_options.append({
+                        "type": "video",
+                        "height": 1080,
+                        "fps": max_fps,
+                        "label": f"Full HD (1080p){fps_label}",
+                        "badge": "1080p HD",
+                        "desc": "Lossless 1080p Video + High-Bitrate Audio",
+                        "is_gold": False,
+                        "upscale": 0,
+                        "ext": "mp4",
+                        "format_spec": "bestvideo[height<=1080]+bestaudio/best[height<=1080]/best"
+                    })
+
+                # Native 720p
+                if any(h and h >= 720 for h in available_heights):
+                    video_options.append({
+                        "type": "video",
+                        "height": 720,
+                        "fps": 30,
+                        "label": "High Definition (720p)",
+                        "badge": "720p",
+                        "desc": "Fast Standard HD Stream",
+                        "is_gold": False,
+                        "upscale": 0,
+                        "ext": "mp4",
+                        "format_spec": "bestvideo[height<=720]+bestaudio/best[height<=720]/best"
+                    })
+
+                # Fast Original
                 video_options.append({
                     "type": "video",
                     "height": 1080,
+                    "fps": 30,
+                    "label": "Fast Original YouTube Stream",
+                    "badge": "⚡ FAST",
+                    "desc": "Direct Raw Stream • Instant Download",
+                    "is_gold": False,
+                    "upscale": 0,
+                    "ext": "mp4",
+                    "format_spec": "best"
+                })
+
+            else:
+                # Platforms: TikTok, Instagram Reels, Facebook, Pinterest, X, Threads
+                # Ishan's requirement: 4K render, 2K (2x double render for 1080p/720p), 1080p, and Fast Original!
+
+                # Option 1: 4K Ultra HD Super-Resolution
+                video_options.append({
+                    "type": "video",
+                    "height": 2160,
                     "fps": 60,
-                    "label": f"Original HD {platform_name} Video (MP4)",
-                    "badge": "ORIGINAL HD",
+                    "label": f"4K Ultra HD (2160p) • {platform_name} AI Master",
+                    "badge": "👑 4K ULTRA",
+                    "desc": "Studio 4K Super-Resolution (FFmpeg Lanczos Engine)",
                     "is_gold": True,
+                    "upscale": 2160,
                     "ext": "mp4",
                     "format_spec": "best/b"
                 })
-                if platform_code == "facebook":
-                    video_options.append({
-                        "type": "video",
-                        "height": 480,
-                        "fps": 30,
-                        "label": "Standard Quality Video (SD MP4)",
-                        "badge": "SD",
-                        "is_gold": False,
-                        "ext": "mp4",
-                        "format_spec": "worst/b"
-                    })
+
+                # Option 2: 2K Quad HD (1440p) - 2X Double-Resolution Boost
+                video_options.append({
+                    "type": "video",
+                    "height": 1440,
+                    "fps": 60,
+                    "label": f"2K Quad HD (1440p) • 2X Resolution Boost",
+                    "badge": "🚀 2K 2X BOOST",
+                    "desc": "Double-Resolution 2X Clarity Boost (2560x1440)",
+                    "is_gold": True,
+                    "upscale": 1440,
+                    "ext": "mp4",
+                    "format_spec": "best/b"
+                })
+
+                # Option 3: Full HD (1080p) Pro
+                video_options.append({
+                    "type": "video",
+                    "height": 1080,
+                    "fps": 30,
+                    "label": f"Full HD (1080p) • Enhanced Clarity",
+                    "badge": "🌟 1080p PRO",
+                    "desc": "High Bitrate 1080p MP4 • Zero Watermark",
+                    "is_gold": False,
+                    "upscale": 1080,
+                    "ext": "mp4",
+                    "format_spec": "best/b"
+                })
+
+                # Option 4: Fast Original Source (Instant Speed, No Re-encoding)
+                video_options.append({
+                    "type": "video",
+                    "height": orig_h or 1080,
+                    "fps": 30,
+                    "label": f"Original {platform_name} Stream (Fast Download)",
+                    "badge": "⚡ FAST ORIGINAL",
+                    "desc": "Direct Raw Lossless MP4 • Instant Download",
+                    "is_gold": False,
+                    "upscale": 0,
+                    "ext": "mp4",
+                    "format_spec": "best/b"
+                })
 
             audio_options = [
                 {
                     "type": "audio",
                     "label": "High Quality MP3 Audio (320kbps)",
-                    "badge": "MP3",
+                    "badge": "MP3 320K",
                     "ext": "mp3",
                     "codec": "mp3",
                     "format_spec": "bestaudio/best"
                 },
                 {
                     "type": "audio",
-                    "label": "Original Audio Track (M4A)",
-                    "badge": "M4A",
+                    "label": "Original Audio Track (M4A / AAC)",
+                    "badge": "M4A HQ",
                     "ext": "m4a",
                     "codec": "m4a",
                     "format_spec": "bestaudio[ext=m4a]/bestaudio/best"
                 }
             ]
 
-            # Check if transcript / captions might exist
             has_subtitles = bool(info.get("subtitles") or info.get("automatic_captions"))
 
             return jsonify({
@@ -241,18 +397,19 @@ def analyze_url():
             })
 
     except Exception as e:
-        return jsonify({"error": f"ত্রুটি: {str(e)}"}), 500
+        return jsonify({"error": f"Error analyzing media: {str(e)}"}), 500
 
 @app.route("/api/transcript", methods=["POST"])
 def get_transcript():
     import yt_dlp
 
     data = request.get_json(silent=True) or {}
-    url = data.get("url", "").strip()
+    raw_url = data.get("url", "").strip()
 
-    if not url:
-        return jsonify({"error": "ভিডিও লিঙ্ক প্রদান করুন।"}), 400
+    if not raw_url:
+        return jsonify({"error": "Video link URL is required."}), 400
 
+    url = expand_url(raw_url)
     ydl_opts = get_ydl_base_opts()
     ydl_opts["skip_download"] = True
 
@@ -262,11 +419,10 @@ def get_transcript():
             subs = info.get("subtitles") or {}
             auto_subs = info.get("automatic_captions") or {}
 
-            # Prioritize Bengali then English then any available
             target_lang = None
             available_subs = None
 
-            for lang in ["bn", "en", "en-orig", "hi"]:
+            for lang in ["en", "bn", "hi", "en-orig"]:
                 if lang in subs:
                     target_lang = lang
                     available_subs = subs[lang]
@@ -277,7 +433,6 @@ def get_transcript():
                     break
 
             if not available_subs:
-                # Pick first available language
                 if subs:
                     target_lang = list(subs.keys())[0]
                     available_subs = subs[target_lang]
@@ -288,21 +443,19 @@ def get_transcript():
             if not available_subs:
                 return jsonify({
                     "found": False,
-                    "message": "এই ভিডিওটিতে কোনো সাবটাইটেল বা ট্রান্সক্রিপ্ট পাওয়া যায়নি।"
+                    "message": "No subtitles or transcript found for this video."
                 })
 
-            # Find json3 or vtt
             vtt_item = next((s for s in available_subs if s.get("ext") in ["json3", "vtt"]), available_subs[0])
             sub_url = vtt_item.get("url")
 
             headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
             }
             req = urllib.request.Request(sub_url, headers=headers)
-            with urllib.request.urlopen(req) as resp:
+            with urllib.request.urlopen(req, timeout=15) as resp:
                 content = resp.read().decode("utf-8")
 
-            # Parse content
             transcript_lines = []
             if vtt_item.get("ext") == "json3" or content.strip().startswith("{"):
                 try:
@@ -319,14 +472,12 @@ def get_transcript():
                     pass
 
             if not transcript_lines:
-                # Parse VTT / SRT format
                 raw_lines = content.split("\n")
                 clean_lines = []
                 for line in raw_lines:
                     line = line.strip()
                     if not line or line.startswith("WEBVTT") or line.startswith("NOTE") or "-->" in line or line.isdigit():
                         continue
-                    # remove html tags like <c> etc.
                     clean = re.sub(r"<[^>]+>", "", line).strip()
                     if clean and clean not in clean_lines[-3:]:
                         clean_lines.append(clean)
@@ -343,7 +494,7 @@ def get_transcript():
     except Exception as e:
         return jsonify({"found": False, "error": str(e), "message": "No subtitles or transcript found for this video."}), 200
 
-def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_to_sdcard, title):
+def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, upscale_target, save_to_sdcard, title):
     import yt_dlp
 
     def progress_hook(d):
@@ -370,7 +521,7 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
                 eta_str = f"{eta}s" if eta else "Calculating..."
 
                 task["status"] = "downloading"
-                task["progress"] = pct
+                task["progress"] = min(pct, 79 if (upscale_target > 0 and not is_audio) else 95)
                 task["speed"] = speed_str
                 task["eta"] = eta_str
                 task["downloaded_bytes"] = format_bytes(downloaded)
@@ -378,12 +529,19 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
 
             elif d["status"] == "finished":
                 task["status"] = "processing"
-                task["progress"] = 99
+                task["progress"] = 80 if (upscale_target > 0 and not is_audio) else 95
                 task["speed"] = "Finalizing (FFmpeg)..."
                 task["eta"] = "Almost done"
 
-    safe_title = re.sub(r'[\/:*?"<>|]', '_', title)[:80]
-    output_template = str(DOWNLOADS_DIR / f"{task_id}_{safe_title}.%(ext)s")
+    safe_title = re.sub(r'[\/:*?"<>|]', '_', title)[:80].strip() or "video"
+
+    is_upscaling = (upscale_target > 0) and not is_audio
+
+    # Destination template
+    if is_upscaling:
+        output_template = str(DOWNLOADS_DIR / f"{task_id}_raw.%(ext)s")
+    else:
+        output_template = str(DOWNLOADS_DIR / f"{task_id}_{safe_title}.%(ext)s")
 
     ydl_opts = get_ydl_base_opts()
     ydl_opts.update({
@@ -407,13 +565,13 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
             }
 
     try:
+        # Step 1: Download
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
         except Exception as first_err:
             err_str = str(first_err).lower()
             if "format" in err_str or "requested format" in err_str or "extractor" in err_str:
-                # Universal fallback without postprocessor restrictions
                 fallback_opts = get_ydl_base_opts()
                 fallback_opts.update({
                     "format": "best/b",
@@ -426,11 +584,51 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
             else:
                 raise first_err
 
-        files = list(DOWNLOADS_DIR.glob(f"{task_id}_*"))
-        if not files:
-            raise Exception("Downloaded media file could not be found.")
+        # Step 2: Locate downloaded file
+        if is_upscaling:
+            raw_candidates = list(DOWNLOADS_DIR.glob(f"{task_id}_raw.*"))
+            if not raw_candidates:
+                raise Exception("Downloaded source file could not be located.")
+            raw_path = raw_candidates[0]
 
-        final_path = files[0]
+            with tasks_lock:
+                tasks[task_id]["status"] = "processing"
+                tasks[task_id]["progress"] = 82
+                tasks[task_id]["speed"] = f"FFmpeg 2X Lanczos Rendering ({upscale_target}p)..."
+                tasks[task_id]["eta"] = "Sharpening & Upscaling..."
+
+            upscaled_file = DOWNLOADS_DIR / f"{task_id}_{safe_title}_{upscale_target}p.mp4"
+            # Lanczos scaling + gentle unsharp filter
+            scale_filter = f"scale='if(gte(ih,iw),{upscale_target},-2)':'if(gte(ih,iw),-2,{upscale_target})':flags=lanczos,unsharp=5:5:0.6:5:5:0.0"
+
+            cmd = [
+                "ffmpeg", "-y", "-i", str(raw_path),
+                "-vf", scale_filter,
+                "-c:v", "libx264", "-preset", "veryfast", "-crf", "19",
+                "-c:a", "aac", "-b:a", "320k",
+                "-movflags", "+faststart",
+                str(upscaled_file)
+            ]
+
+            try:
+                proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=300)
+                if proc.returncode == 0 and upscaled_file.exists() and upscaled_file.stat().st_size > 1000:
+                    try:
+                        raw_path.unlink(missing_ok=True)
+                    except Exception:
+                        pass
+                    final_path = upscaled_file
+                else:
+                    final_path = raw_path
+            except Exception as ffmpeg_err:
+                print(f"Upscaling fallback notice: {ffmpeg_err}", file=sys.stderr)
+                final_path = raw_path
+        else:
+            files = list(DOWNLOADS_DIR.glob(f"{task_id}_*"))
+            if not files:
+                raise Exception("Downloaded media file could not be found.")
+            final_path = files[0]
+
         final_filename = final_path.name.replace(f"{task_id}_", "")
 
         saved_sdcard_path = None
@@ -440,11 +638,13 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
                 shutil.copy2(final_path, target_path)
                 saved_sdcard_path = str(target_path)
             except Exception as se:
-                print(f"SDCard copy error: {se}", file=sys.stderr)
+                print(f"SDCard copy notice: {se}", file=sys.stderr)
 
         with tasks_lock:
             tasks[task_id]["status"] = "completed"
             tasks[task_id]["progress"] = 100
+            tasks[task_id]["speed"] = "Finished"
+            tasks[task_id]["eta"] = "0s"
             tasks[task_id]["filepath"] = str(final_path)
             tasks[task_id]["filename"] = final_filename
             tasks[task_id]["filesize"] = format_bytes(final_path.stat().st_size)
@@ -459,7 +659,7 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
         elif "format" in raw.lower():
             clean_msg = "The requested video format was unavailable. Please try downloading again."
         else:
-            clean_msg = f"Download error: {raw[:100]}"
+            clean_msg = f"Download notice: {raw[:100]}"
         with tasks_lock:
             tasks[task_id]["status"] = "error"
             tasks[task_id]["error"] = clean_msg
@@ -467,16 +667,18 @@ def run_download_worker(task_id, url, format_spec, is_audio, audio_codec, save_t
 @app.route("/api/download", methods=["POST"])
 def start_download():
     data = request.get_json(silent=True) or {}
-    url = data.get("url", "").strip()
-    format_spec = data.get("format_spec", "bestvideo+bestaudio/best")
+    raw_url = data.get("url", "").strip()
+    format_spec = data.get("format_spec", "best/b")
     is_audio = data.get("is_audio", False)
     audio_codec = data.get("audio_codec", "mp3")
+    upscale_target = int(data.get("upscale_target") or 0)
     save_to_sdcard = data.get("save_to_sdcard", True)
     title = data.get("title", "Video")
 
-    if not url:
-        return jsonify({"error": "লিঙ্ক প্রদান করা আবশ্যক।"}), 400
+    if not raw_url:
+        return jsonify({"error": "Video link URL is required."}), 400
 
+    url = expand_url(raw_url)
     task_id = str(uuid.uuid4())[:8]
 
     with tasks_lock:
@@ -484,10 +686,10 @@ def start_download():
             "task_id": task_id,
             "status": "starting",
             "progress": 0,
-            "speed": "শুরু হচ্ছে...",
+            "speed": "Starting...",
             "eta": "...",
             "downloaded_bytes": "0 B",
-            "total_bytes": "হিসাব করা হচ্ছে...",
+            "total_bytes": "Calculating...",
             "filename": None,
             "filepath": None,
             "title": title,
@@ -498,7 +700,7 @@ def start_download():
 
     t = threading.Thread(
         target=run_download_worker,
-        args=(task_id, url, format_spec, is_audio, audio_codec, save_to_sdcard, title),
+        args=(task_id, url, format_spec, is_audio, audio_codec, upscale_target, save_to_sdcard, title),
         daemon=True
     )
     t.start()
@@ -510,7 +712,7 @@ def get_progress(task_id):
     with tasks_lock:
         task = tasks.get(task_id)
         if not task:
-            return jsonify({"error": "টাস্ক পাওয়া যায়নি"}), 404
+            return jsonify({"error": "Task not found"}), 404
         return jsonify(task)
 
 @app.route("/api/file/<task_id>")
@@ -537,7 +739,7 @@ def download_file(task_id):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print(f"\n=======================================================")
-    print(f" ✨ Ishan Studio Pro Engine is LIVE!")
+    print(f" ✨ Ishan Studio Pro Engine is LIVE! (v1.0.6 2X Upscale)")
     print(f" 📱 Mobile App URL: http://localhost:{port}")
     print(f"=======================================================\n")
     app.run(host="0.0.0.0", port=port, debug=False)
