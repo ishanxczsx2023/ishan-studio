@@ -44,7 +44,7 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "app": "Ishan Studio Pro Engine",
-        "version": "1.0.1"
+        "version": "1.0.2"
     }), 200
 
 def detect_platform(url):
